@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "RRYZ59HcScg=",
+  "dgSpecHash": "Xo+Fn+THfgk=",
   "success": true,
   "projectFilePath": "/Users/rowjas/RiderProjects/Lingafon5/server/Lingafon.Infrastructure/Lingafon.Infrastructure.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/Users/rowjas/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/6.0.0/microsoft.extensions.dependencyinjection.abstractions.6.0.0.nupkg.sha512"
+  ],
   "logs": []
 }

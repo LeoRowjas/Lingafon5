@@ -1,3 +1,7 @@
+using Lingafon.Application;
+using Lingafon.Infrastructure;
+using Microsoft.OpenApi.Models;
+
 namespace Lingafon.API;
 
 public class Program
@@ -5,14 +9,33 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        builder.Services.AddAuthorization();
+        builder.Services.AddControllers();
+        //TODO: CORS
+        //TODO: Authentication & Authorization BEARING
+        //TODO: DB CONNECTION
+        //TODO: EXCEPTION HANDLING MIDDLEWARE
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen(options =>
+        {
+            options.SwaggerDoc("Lingafon", new OpenApiInfo
+            {
+                Title = "Lingafon API",
+                Version = "v1",
+                Description = "API for Lingafon cabinet, team 5.",
+                
+            });
+        });
         builder.Services.AddOpenApi();
+        
+        builder.Services.AddApplicationServices(); //Register Application layer services
+        builder.Services.AddInfrastructureServices(); //Register Infrastructure layer services
 
         var app = builder.Build();
 
         if (app.Environment.IsDevelopment())
         {
-            app.MapOpenApi();
+            app.UseSwagger();
+            app.UseSwaggerUI();
         }
 
         app.UseHttpsRedirection();

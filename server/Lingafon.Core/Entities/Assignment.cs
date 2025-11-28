@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Lingafon.Core.Entities;
 
-public class Assignments : BaseEntity
+public class Assignment : BaseEntity
 {
     [Required]
     [MaxLength(150)]
