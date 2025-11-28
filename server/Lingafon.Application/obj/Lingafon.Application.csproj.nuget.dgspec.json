@@ -48,9 +48,9 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
-            "AutoMapper.Extensions.Microsoft.DependencyInjection": {
+            "Microsoft.Extensions.DependencyInjection.Abstractions": {
               "target": "Package",
-              "version": "[12.0.0, )"
+              "version": "[9.0.6, )"
             }
           },
           "imports": [

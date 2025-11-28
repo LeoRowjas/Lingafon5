@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Lingafon.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ef70c7bfced024e2ceafe55c1de2da5a6d560e93")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cc71e8b33dcaad28da07310915325cd952e7fb6a")]
 [assembly: System.Reflection.AssemblyProductAttribute("Lingafon.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Lingafon.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
