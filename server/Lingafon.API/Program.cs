@@ -1,5 +1,6 @@
 using Lingafon.Application;
 using Lingafon.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 namespace Lingafon.API;
@@ -13,6 +14,10 @@ public class Program
         //TODO: CORS
         //TODO: Authentication & Authorization BEARING
         //TODO: DB CONNECTION
+        builder.Services.AddDbContext<LingafonDbContext>(option=>
+        {
+            option.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+        });
         //TODO: EXCEPTION HANDLING MIDDLEWARE
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>

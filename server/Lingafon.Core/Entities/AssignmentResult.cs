@@ -3,7 +3,7 @@ using Lingafon.Core.Enums;
 
 namespace Lingafon.Core.Entities;
 
-public class AssignmentResult
+public class AssignmentResult : BaseEntity
 {
     [Required]
     public int Grade { get; set; }
