@@ -13,7 +13,7 @@ public class Program
         builder.Services.AddControllers();
         //TODO: CORS
         //TODO: Authentication & Authorization BEARING
-        //TODO: DB CONNECTION
+
         builder.Services.AddDbContext<LingafonDbContext>(option=>
         {
             option.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));

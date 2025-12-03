@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Lingafon.Core.Enums;
 
 namespace Lingafon.Core.Entities;
 
@@ -15,4 +16,5 @@ public class Assignment : BaseEntity
     public string? Description { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? DueDate { get; set; }
+    public AssignmentStatus Status { get; set; }
 }

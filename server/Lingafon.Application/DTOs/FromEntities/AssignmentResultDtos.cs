@@ -2,7 +2,8 @@ using Lingafon.Core.Enums;
 
 namespace Lingafon.Application.DTOs.FromEntities;
 
-public record AssignmentResultReadDto(Guid Id, int Grade, Guid AssignmentId, Guid StudentId, DateTime SubmittedAt, string? Feedback, AssignmentStatus Status);
+public record AssignmentResultReadDto(Guid Id, int Grade, Guid AssignmentId, 
+    Guid StudentId, DateTime SubmittedAt, string? Feedback, AssignmentStatus Status);
 
 public record AssignmentResultCreateDto
 {

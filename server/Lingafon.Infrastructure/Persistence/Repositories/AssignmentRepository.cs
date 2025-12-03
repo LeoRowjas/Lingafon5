@@ -1,4 +1,5 @@
 using Lingafon.Core.Entities;
+using Lingafon.Core.Enums;
 using Lingafon.Core.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -64,5 +65,16 @@ public class AssignmentRepository : IAssignmentRepository
         return await _context.Assignments
             .Where(a => a.StudentId == studentId)
             .ToListAsync();
+    }
+
+    public async Task<bool> UpdateStatusAsync(Guid assignmentId, AssignmentStatus status)
+    {
+        var assignment = await _context.Assignments.FindAsync(assignmentId);
+        if (assignment is null)
+            return false;
+        assignment.Status = status;
+        _context.Update(assignment);
+        await _context.SaveChangesAsync();
+        return true;
     }
 }

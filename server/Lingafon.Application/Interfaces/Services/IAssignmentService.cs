@@ -7,5 +7,5 @@ public interface IAssignmentService : IService<AssignmentReadDto, AssignmentCrea
 {
     Task<IEnumerable<AssignmentReadDto>> GetForTeacherAsync(Guid teacherId);
     Task<IEnumerable<AssignmentReadDto>> GetForStudentAsync(Guid studentId);
-    Task UpdateStatusAsync(Guid id, AssignmentStatus status);
+    Task<bool> UpdateStatusAsync(Guid id, AssignmentStatus status);
 }
