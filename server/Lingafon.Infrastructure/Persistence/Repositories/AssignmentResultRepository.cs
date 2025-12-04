@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Lingafon.Infrastructure.Persistence.Repositories;
 
-public class AssignmentResulRepository : IAssignmentResultRepository
+public class AssignmentResultRepository : IAssignmentResultRepository
 {
     private LingafonDbContext _context;
-    public AssignmentResulRepository(LingafonDbContext context)
+    public AssignmentResultRepository(LingafonDbContext context)
     {
         _context = context;
     }

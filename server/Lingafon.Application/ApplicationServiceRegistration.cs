@@ -10,7 +10,6 @@ public static class ApplicationServiceRegistration
     {
         services.AddAutoMapper(_ => { }, typeof(ApplicationServiceRegistration).Assembly);
         
-        // Register all services
         services.AddScoped<IAssignmentService, AssignmentService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IDialogService, DialogService>();

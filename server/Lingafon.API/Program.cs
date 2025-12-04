@@ -1,4 +1,6 @@
+using Lingafon.Api.Middleware;
 using Lingafon.Application;
+using Lingafon.Application.DTOs.FromEntities;
 using Lingafon.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -18,16 +20,17 @@ public class Program
         {
             option.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
         });
+        
+        
         //TODO: EXCEPTION HANDLING MIDDLEWARE
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>
         {
-            options.SwaggerDoc("Lingafon", new OpenApiInfo
+            options.SwaggerDoc("v1", new OpenApiInfo
             {
                 Title = "Lingafon API",
                 Version = "v1",
                 Description = "API for Lingafon cabinet, team 5.",
-                
             });
         });
         builder.Services.AddOpenApi();
@@ -43,6 +46,9 @@ public class Program
             app.UseSwaggerUI();
         }
 
+        app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+        app.MapControllers();
         app.UseHttpsRedirection();
         app.UseAuthorization();
         
