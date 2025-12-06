@@ -1,0 +1,33 @@
+.wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 42px 10px 14px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  height: 48px;
+  font-size: 14px;
+  background: #fff;
+  outline: none;
+  color: black;
+
+  &::placeholder {
+    color: #9b9b9b;
+  }
+
+  &:focus {
+    border-color: #b8b8b8;
+  }
+}
+
+.icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  pointer-events: none;
+}
