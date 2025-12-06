@@ -15,6 +15,7 @@ public static class ApplicationServiceRegistration
         services.AddScoped<IDialogService, DialogService>();
         services.AddScoped<IMessageService, MessageService>();
         services.AddScoped<IAssignmentResultService, AssignmentResultService>();
+        services.AddScoped<IAuthService, AuthService>();
         
         return services;
     }

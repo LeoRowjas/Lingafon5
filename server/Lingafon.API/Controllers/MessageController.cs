@@ -1,11 +1,12 @@
 using Lingafon.Application.DTOs.FromEntities;
 using Lingafon.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lingafon.API.Controllers;
 
 [ApiController]
-[Route("api/messages")]
+[Route("api/[controller]")]
 public class MessageController : ControllerBase
 {
     private readonly IMessageService _service;
@@ -35,6 +36,7 @@ public class MessageController : ControllerBase
         return Ok(message);
     }
 
+    [Authorize]
     [HttpPost("")]
     public async Task<IActionResult> CreateMessage([FromBody] MessageCreateDto message)
     {
@@ -42,6 +44,7 @@ public class MessageController : ControllerBase
         return Ok(created);
     }
 
+    [Authorize]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateMessage([FromBody] MessageCreateDto messageUpdate)
     {
@@ -49,6 +52,7 @@ public class MessageController : ControllerBase
         return Ok();
     }
 
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteMessage(Guid id)
     {

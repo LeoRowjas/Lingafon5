@@ -3,6 +3,7 @@ using System;
 using Lingafon.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Lingafon.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(LingafonDbContext))]
-    partial class LingafonDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251206063411_UserBirthAdded")]
+    partial class UserBirthAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

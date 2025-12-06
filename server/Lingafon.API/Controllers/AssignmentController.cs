@@ -1,12 +1,13 @@
 using Lingafon.Application.DTOs.FromEntities;
 using Lingafon.Application.Interfaces.Services;
 using Lingafon.Core.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lingafon.API.Controllers;
 
 [ApiController]
-[Route("api/assignments")]
+[Route("api/[controller]")]
 public class AssignmentController : ControllerBase
 {
     private IAssignmentService _service;
@@ -16,6 +17,7 @@ public class AssignmentController : ControllerBase
         _service = service;
     }
 
+    [Authorize]
     [HttpGet("")]
     public async Task<IActionResult> GetAll(
         [FromQuery] Guid? teacherId,
@@ -41,7 +43,8 @@ public class AssignmentController : ControllerBase
         var all = await _service.GetAllAsync();
         return Ok(all);
     }
-
+    
+    [Authorize]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(Guid id)
     {
@@ -49,6 +52,7 @@ public class AssignmentController : ControllerBase
         return Ok(assignment);
     }
 
+    [Authorize]
     [HttpPost("")]
     public async Task<IActionResult> CreateAssignment([FromBody] AssignmentCreateDto assignment)
     {
@@ -56,6 +60,7 @@ public class AssignmentController : ControllerBase
         return Ok(creation);
     }
 
+    [Authorize]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateAssignment([FromBody] AssignmentUpdateDto assignmentUpdate)
     {
@@ -63,13 +68,14 @@ public class AssignmentController : ControllerBase
         return Ok();
     }
 
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAssignment(Guid id)
     {
         var isDeleted = await _service.DeleteAsync(id);
         return Ok(isDeleted);
     }
-
+    
     [HttpPut("{id}/status/update")]
     public async Task<IActionResult> UpdateAssignmentStatus(Guid id, [FromQuery]AssignmentStatus status)
     {

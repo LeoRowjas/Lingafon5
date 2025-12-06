@@ -1,11 +1,12 @@
 using Lingafon.Application.DTOs.FromEntities;
 using Lingafon.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lingafon.API.Controllers;
 
 [ApiController]
-[Route("api/dialogs")]
+[Route("api/[controller]")]
 public class DialogController : ControllerBase
 {
     private readonly IDialogService _service;
@@ -27,7 +28,7 @@ public class DialogController : ControllerBase
         var dialogs = await _service.GetAllAsync();
         return Ok(dialogs);
     }
-
+    
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(Guid id)
     {
@@ -35,6 +36,7 @@ public class DialogController : ControllerBase
         return Ok(dialog);
     }
 
+    [Authorize]
     [HttpPost("")]
     public async Task<IActionResult> CreateDialog([FromBody] DialogCreateDto dialog)
     {
@@ -42,6 +44,7 @@ public class DialogController : ControllerBase
         return Ok(created);
     }
 
+    [Authorize]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateDialog([FromBody] DialogCreateDto dialogUpdate)
     {
@@ -49,6 +52,7 @@ public class DialogController : ControllerBase
         return Ok();
     }
 
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteDialog(Guid id)
     {
