@@ -1,0 +1,49 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lingafon-api
+    ports:
+      - "5001:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Server=postgres;Database=LingafonDB;Username=postgres;Password=postgres;
+      - Jwt__SecretKey=development-secret-key-at-least-32-characters
+      - Jwt__Issuer=Lingafon
+      - Jwt__Audience=LingafonUsers
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - lingafon-network
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: lingafon-postgres
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=LingafonDB
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d LingafonDB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - lingafon-network
+    restart: unless-stopped
+
+networks:
+  lingafon-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+
