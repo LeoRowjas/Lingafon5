@@ -19,7 +19,7 @@
     /* Aliases */
     "baseUrl": "./src",
     "paths": {
-      "@assets/*": ["App/assets/*"],
+      "@assets/*": ["assets/*"],
       "@entities/*": ["App/entities/*"],
       "@features/*": ["App/features/*"],
       "@pages/*": ["App/pages/*"],
