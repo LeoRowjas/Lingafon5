@@ -12,7 +12,8 @@ public class User : BaseEntity
     [MaxLength(100)]
     public string LastName { get; set; } = string.Empty;
     [Required]
-    public DateTime DateOfBirth { get; set; }
+    [MaxLength(100)]
+    public string MiddleName { get; set; } = string.Empty;
     [Required]
     [MaxLength(100)]
     public string Email { get; set; } = string.Empty;

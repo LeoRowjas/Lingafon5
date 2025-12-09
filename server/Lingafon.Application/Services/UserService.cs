@@ -3,26 +3,28 @@ using Lingafon.Application.DTOs.FromEntities;
 using Lingafon.Application.Interfaces.Services;
 using Lingafon.Core.Entities;
 using Lingafon.Core.Interfaces.Repositories;
+using Lingafon.Core.Interfaces.Services;
+using Microsoft.Extensions.Options;
 
 namespace Lingafon.Application.Services;
 
 public class UserService : IUserService
 {
+    private readonly IFileStorageService _storageService;
     private readonly IUserRepository _repository;
     private readonly IMapper _mapper;
 
-    public UserService(IUserRepository repository, IMapper mapper)
+    public UserService(IUserRepository repository, IMapper mapper, IFileStorageService storageService)
     {
         _repository = repository;
         _mapper = mapper;
+        _storageService = storageService;
     }
 
     public async Task<UserReadDto?> GetByIdAsync(Guid id)
     {
         var user = await _repository.GetByIdAsync(id);
-        if (user is null)
-            return null;
-        return _mapper.Map<UserReadDto>(user);
+        return user is null ? null : _mapper.Map<UserReadDto>(user);
     }
 
     public async Task<IEnumerable<UserReadDto>> GetAllAsync()
@@ -55,6 +57,30 @@ public class UserService : IUserService
         if (user is null)
             return null;
         return _mapper.Map<UserReadDto>(user);
+    }
+
+    public async Task<string?> UpdateAvatarUrlAsync(Guid id, Stream fileStream, string fileName, string contentType)
+    {
+        var user = await _repository.GetByIdAsync(id);
+        if (user is null)
+            return null;
+        
+        if(!string.IsNullOrEmpty(user.AvatarUrl))
+            await _storageService.DeleteFileAsync(user.AvatarUrl);
+
+        var path = await _storageService.UploadFileAsync(fileStream, fileName, contentType);
+        await _repository.UpdateAvatarUrlAsync(id, path);
+        
+        return path;
+    }
+
+    public async Task<bool> DeleteAvatarAsync(Guid id)
+    {
+        var user = await _repository.GetByIdAsync(id);
+        if (user is null)
+            return false;
+        await _storageService.DeleteFileAsync(user.AvatarUrl);
+        return await _repository.DeleteAvatarAsync(id);
     }
 }
 

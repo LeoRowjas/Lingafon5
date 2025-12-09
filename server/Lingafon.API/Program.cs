@@ -33,8 +33,6 @@ public class Program
             option.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
         });
         
-        
-        //TODO: EXCEPTION HANDLING MIDDLEWARE
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>
         {
@@ -86,10 +84,8 @@ public class Program
             });
         builder.Services.AddAuthorization();
         
-        builder.Services.AddOpenApi();
-        
         builder.Services.AddApplicationServices(); //Register Application layer services
-        builder.Services.AddInfrastructureServices(); //Register Infrastructure layer services
+        builder.Services.AddInfrastructureServices(builder.Configuration); //Register Infrastructure layer services
 
         var app = builder.Build();
         

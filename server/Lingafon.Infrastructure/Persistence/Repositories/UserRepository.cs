@@ -57,4 +57,22 @@ public class UserRepository : IUserRepository
         return await _context.Users
             .FirstOrDefaultAsync(u => u.Email == email);
     }
+
+    public async Task<string> UpdateAvatarUrlAsync(Guid id, string avatarUrl)
+    {
+        var user = await _context.Users.FindAsync(id);
+        user!.AvatarUrl = avatarUrl;
+        await _context.SaveChangesAsync();
+        return avatarUrl;
+    }
+
+    public async Task<bool> DeleteAvatarAsync(Guid id)
+    {
+        var user = await _context.Users.FindAsync(id);
+        if (user == null)
+            return false;
+        user!.AvatarUrl = string.Empty;
+        await _context.SaveChangesAsync();
+        return true;
+    }
 }

@@ -1,4 +1,3 @@
-using System.Net;
 using Lingafon.Application.DTOs.Auth;
 using Lingafon.Application.Interfaces.Services;
 using Lingafon.Core.Entities;
@@ -23,10 +22,9 @@ public class AuthService : IAuthService
     public async Task<LoginResponseDto> LoginAsync(LoginRequestDto request)
     {
         var user = await _userRepository.GetByEmailAsync(request.Email);
-        if (user == null || !_passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password)) 
-            //TODO: прикрутить нот фаунд эксепшн, потому что строка сверху будет кидать исключение
+        if (user == null || !_passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password))
         {
-            throw new Exception(); //TODO: прикрутить ошибку неправильных кредентиалс
+            throw new UnauthorizedAccessException("Invalid email or password");
         }
         
         var token = _jwtService.GenerateJwtToken(user.Id, user.Email, user.Role);
@@ -44,7 +42,7 @@ public class AuthService : IAuthService
         var existingUser = await _userRepository.GetByEmailAsync(request.Email);
         if (existingUser != null)
         {
-            throw new Exception();
+            throw new InvalidOperationException("User with this email already exists");
         }
         
         var user = new User()
@@ -52,9 +50,9 @@ public class AuthService : IAuthService
             Email = request.Email,
             FirstName = request.FirstName,
             LastName = request.LastName,
+            MiddleName = request.MiddleName,
             Role = request.Role,
             CreatedAt = DateTime.UtcNow,
-            DateOfBirth = request.DateOfBirth.ToUniversalTime(),
         };
         user.PasswordHash = _passwordHasher.HashPassword(user, request.Password);
         
