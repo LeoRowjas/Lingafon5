@@ -1,18 +1,46 @@
+import { useState } from "react";
 import styles from './WebLoginForm.module.scss'
-
 import bgImage from "@assets/bgLogin.png";
-
 import { InputReg } from '@ui/inputReg/InputReg'
 import { ButtonRegSocial } from "@ui/buttonRegSocial/buttonRegSocial";
 import {ButtonReg} from '@ui/buttonReg/ButtonReg'
-
-
 import { RoleSwitcher } from '@ui/RoleSwitcher/RoleSwitcher'
 import { PiAtThin } from "react-icons/pi";
 import { FaFacebookF } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
+import { useNavigate } from "react-router-dom";
+import { login } from "../../../api/auth.api";
 
 export function WebLoginForm() {
+    const navigate = useNavigate();
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const handleLogin = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const data = await login({email, password});
+
+            localStorage.setItem("token", data.token);
+
+            navigate("/profile");
+        } catch (e: any){
+            const msg =
+                e.response?.data?.message ||
+                e.response?.data?.error ||
+                "Ошибка входа";
+
+            setError(msg);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return(
     <div className={styles.bg}>
         <img className={styles.bgImage} src={bgImage} alt="background" />
@@ -30,11 +58,17 @@ export function WebLoginForm() {
                 <p>Адрес электронной почты</p>
                 <InputReg type="email"
                 placeholder="Введите свой адрес электронной почты"
-                icon={<PiAtThin size={20} />}/>
+                icon={<PiAtThin size={20} />}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}/>
+
                 <p>Пароль</p>
+
                 <InputReg type="password"
                 placeholder="Введите ваш пароль"
-                icon={<PiAtThin size={20} />}/>
+                icon={<PiAtThin size={20} />}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}/>
 
                 <div>
                     <div>
@@ -44,7 +78,7 @@ export function WebLoginForm() {
                     <a href="">Забыли пароль?</a>
                 </div>
 
-                <ButtonReg text="Войти" onClick={() => alert('Registered!')} />
+                <ButtonReg text={loading ? "Вход..." : "Войти"} onClick={handleLogin} />
                 
                 <p className='text-center'>Или продолжить с</p>
                 
