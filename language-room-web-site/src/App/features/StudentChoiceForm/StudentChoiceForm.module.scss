@@ -1,3 +1,21 @@
+.bg{
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bgImage{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+
+}
+
 .selectRole {
   width: 1317px;
   height: 736px;
@@ -10,28 +28,7 @@
   grid-template-rows: auto auto auto auto 1fr auto;
   row-gap: 30px;
 }
-.bg{
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.stepText {
-  font-weight: 400;
-  font-size: 32px;
-  color: #1A202C;
-  font-weight: 500;
-}
-.bgImage{
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: -1;
 
-}
 .header {
   display: flex;
   align-items: center;
@@ -56,6 +53,18 @@
   justify-content: center;
   font-size: 48px;
   font-weight: 600;
+}
+.subtitle {
+  font-size: 36px;
+  font-weight: 500;
+  color: #1A202C;
+}
+
+.stepText {
+  font-weight: 400;
+  font-size: 32px;
+  color: #1A202C;
+  font-weight: 500;
 }
 
 .steps {
@@ -106,41 +115,11 @@
   height: 1px;
   background: #4caf50;
 }
-
-.subtitle {
-  font-size: 36px;
-  font-weight: 500;
-  color: #1A202C;
+.infoRole{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
-
-.selectedTheme {
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 18px 14px;
-  font-size: 13px;
-  height: 55px;
-  width: 1088px;
-
-  span {
-    color: #6b7280;
-    margin-right: 6px;
-  }
-
-  strong {
-    color: #1f2937;
-    font-weight: 600;
-    font-size: 14px;
-  }
-}
-
-
-.rolesGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-auto-rows: 102px;
-  gap: 20px;
-}
-
 .roleCard {
   background: #ffffff;
   border-radius: 12px;
@@ -171,26 +150,24 @@
   }
 }
 
-.roleIcon,
-.roleIconBlue {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
+.selectedTheme {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 14px 14px;
+  font-size: 13px;
+  height: 70px;
+  width: 1088px;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  span {
+    color: #6b7280;
+    margin-right: 6px;
+  }
 
-  color: #fff;
-  font-weight: 600;
-}
-
-.roleIcon {
-  background: #4caf50;
-}
-
-.roleIconBlue {
-  background: #3b82f6;
+  strong {
+    color: #1f2937;
+    font-weight: 600;
+    font-size: 14px;
+  }
 }
 
 .backButton {
@@ -210,52 +187,69 @@
   cursor: pointer;
 }
 
-//''''''
 
-.subtitleMain{
-  font-size: 26px;
-  font-weight: 500;
-}
-
-.mainShow{
+.studentsList {
   display: flex;
   flex-direction: column;
-  align-items: center;
-
-  >p{
-    color: #5F6572;
-  }
+  gap: 12px;
 }
 
-.clockImg{
-  width: 120px;
-  height: auto;
-}
-.summary{
-  margin: 20px 0;
-  gap: 3px;
+.studentCard {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  width: 1088px;
   align-items: center;
-  background-color: #ffffff;
-  border-radius: 8px;
-  padding: 20px;
+  padding: 14px 16px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.summaryItem{
-  >span{
-    color: #5F6572;
-    margin-right: 4px;
-    
-  }
+.studentInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.buttonRed{
-  margin-top: 10px;
-  font-weight: 300;
-  width: 120px;
-  background: #D32F2F;
-  font-size: 20px;
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #3b82f6;
   color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
 
+.studentName {
+  font-weight: 600;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.statusOnline {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+}
+
+.inviteButton {
+  width: 300px;
+  height: 40px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: #3b82f6;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
 }

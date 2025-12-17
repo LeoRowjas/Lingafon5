@@ -19,9 +19,9 @@ export const UserCard = () => {
 
           <div className="">
               <h4>Личная информация</h4>
-              <p>ФИО</p>
+              <p className={styles.subText}>ФИО</p>
               <h3>Смирнов Александр Викторович</h3>
-              <p>Должность</p>
+              <p className={styles.subText}>Должность</p>
               <h3>Преподаватель английского языка</h3>
           </div>
 

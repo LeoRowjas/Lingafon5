@@ -1,12 +1,13 @@
 import styles from "./SelectRoleForm.module.scss";
 import bgImage from "@assets/bgLogin.png";
 import {Link} from 'react-router-dom'
-import { useLocation } from "react-router-dom";
+import { useStudentChoice } from "@entities/ChatSelectionContext";
+import { useNavigate } from "react-router-dom";
 
 export const SelectRoleForm = () => {
 
-    const location = useLocation();
-    const selectedCard = location.state?.selectedCard;
+    const { choice, setRole } = useStudentChoice();
+    const navigate = useNavigate();
 
 
   return (
@@ -42,11 +43,16 @@ export const SelectRoleForm = () => {
 
         <div className={styles.selectedTheme}>
             <span>Выбранная тема:</span>
-            <strong>{selectedCard?.title}</strong>
+            <strong>{choice.theme}</strong>
         </div>
 
         <div className={styles.rolesGrid}>
-            <div className={styles.roleCard}>
+            <div className={styles.roleCard}
+                        onClick={() => {
+                setRole("Консультант");
+                navigate("/student-choice");
+            }}
+            >
             <span className={styles.roleIcon}>К</span>
             <div>
                 <h3>Консультант</h3>
@@ -54,7 +60,11 @@ export const SelectRoleForm = () => {
             </div>
             </div>
 
-            <div className={styles.roleCard}>
+            <div className={styles.roleCard}
+            onClick={() => {
+                setRole("Клиент");
+                navigate("/student-choice");
+            }}>
             <span className={styles.roleIconBlue}>К</span>
             <div>
                 <h3>Клиент</h3>

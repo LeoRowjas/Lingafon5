@@ -1,9 +1,11 @@
 import styles from "./CreateChat.module.scss";
 import bgImage from "@assets/bgLogin.png";
 import { Link } from "react-router-dom";
-
+import { useStudentChoice } from '@entities/ChatSelectionContext'
 
 export const CreateChatForm = () => {
+
+  const { setTheme } = useStudentChoice();
 
   const cards = [
   { id: 1, title: "Консультация по продукту" },
@@ -36,6 +38,7 @@ export const CreateChatForm = () => {
         <Link
           key={card.id}
           to="/select-role"
+          onClick={() => setTheme(card.title)}
           state={{ selectedCard: card }}
           className={styles.card}
         >

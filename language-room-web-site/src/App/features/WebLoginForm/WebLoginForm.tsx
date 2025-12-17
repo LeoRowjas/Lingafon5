@@ -88,27 +88,13 @@ export function WebLoginForm() {
                 </div>
             </div>
 
-            <div className={styles.wrapper}>
+                <div className={styles.wrapper}>
                     <p className={styles.row}>
                         У вас нет учетной записи?
                         <a href="/register" className={styles.link}>
                         Зарегистрируйтесь здесь
                         </a>
                     </p>
-
-                    <p className={styles.agree}>
-                        Регистрируясь, вы соглашаетесь с нашими
-                    </p>
-
-                    <div className={styles.col}>
-                        <a href="/terms" className={styles.policy}>
-                        Условиями обслуживания
-                        </a>
-                        <pre className='text-[12]'> и </pre>
-                        <a href="/terms" className={styles.policy}>
-                            Политикой конфиденциальности
-                        </a>
-                    </div>
                 </div>
         </div>
     </div>

@@ -1,6 +1,5 @@
-
 .card{
-    width: 1648px;
+    width: 1200px;
     margin: 0 auto;
     padding-top: 30px;
     gap: 38px;
@@ -11,15 +10,14 @@
 .avatar{
     display: flex;
     justify-content: space-between;
-    max-width: 1648px;
+    max-width: 1200px;
     padding: 20px;
     background-color: #fff;
     border-radius: 12px;
-    
 
 }
 
-p{
+.subText{
     color: #5F6572;
     font-size: 32px;
 }
@@ -46,16 +44,17 @@ h1{
 }
 
 .buttonFooter{
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 20px;
 }
 
 .buttonBlue{
     height: 78px;
-    width: 534px;
+    width: 100%;
     background: #3881F0;
     color: #fff;
-    font-size: 36px;
+    font-size: 30px;
 
     display: inline-flex;
     align-items: center;
@@ -77,9 +76,9 @@ h1{
 
 .buttonGreen{
     height: 78px;
-    width: 534px;
+    width: 100%;
     background: #4CAF50;
-    font-size: 36px;
+    font-size: 30px;
     color: #fff;
 
     display: inline-flex;
@@ -102,9 +101,9 @@ h1{
 }
 .buttonOrange{
     height: 78px;
-    width: 534px;
+    width: 100%;
     background: #FF9800;
-    font-size: 36px;
+    font-size: 30px;
     color: #fff;
 
     display: inline-flex;
