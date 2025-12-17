@@ -1,48 +1,153 @@
-.bgImg{
-    z-index: -1;
-}
+
 .card{
-    display: flex;
-
-}
-
-.rectangle{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 670px;
-    height: 362px;
-    background-color: #b7d0f7;
-    border-radius: 16px 0 16px 0;
-}
-
-
-.blogAuthor{
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    gap: 20px;
-    margin-top: 20px;
-}
-
-.wrapper{
-    max-width: 550px;
-    height: 250px;
-    background-color: #fff;
-    border-radius: 22px;
+    width: 1648px;
+    margin: 0 auto;
+    padding-top: 30px;
+    gap: 38px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-}
-.name{
-    font-size: 24px;
 }
 
-.teacher{
-    font-size: 24px;
+.avatar{
+    display: flex;
+    justify-content: space-between;
+    max-width: 1648px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    
+
 }
-.group{
-    padding-left: 20px;
-    font-size: 24px;
-    color: #3881F0;
+
+p{
+    color: #5F6572;
+    font-size: 32px;
+}
+
+h3{
+    color: #1A202C;
+    font-size: 40px;
+}
+h4{
+    color: #1A202C;
+    font-size: 48px;
+}
+h1{
+    color: #1A202C;
+    font-size: 96px;
+    font-weight: bold;
+}
+.imgAvatar{
+
+    >img{
+    width: 192px;
+    height: 192px;
+    }
+}
+
+.buttonFooter{
+    display: flex;
+    gap: 20px;
+}
+
+.buttonBlue{
+    height: 78px;
+    width: 534px;
+    background: #3881F0;
+    color: #fff;
+    font-size: 36px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 12px 20px;
+    color: #fff;
+
+    border-radius: 10px;
+    border: 1px solid transparent;
+
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+        filter: brightness(1.05);
+    }
+}
+
+.buttonGreen{
+    height: 78px;
+    width: 534px;
+    background: #4CAF50;
+    font-size: 36px;
+    color: #fff;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 12px 20px;
+    color: #fff;
+
+    border-radius: 10px;
+    border: 1px solid transparent;
+
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+        filter: brightness(1.05);
+    }
+
+}
+.buttonOrange{
+    height: 78px;
+    width: 534px;
+    background: #FF9800;
+    font-size: 36px;
+    color: #fff;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 12px 20px;
+    color: #fff;
+
+    border-radius: 10px;
+    border: 1px solid transparent;
+
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+        filter: brightness(1.05);
+    }
+    
+}
+
+.buttonWithBadge {
+  position: relative;
+  display: inline-block;
+}
+
+.badge {
+  position: absolute;
+  top: -24px;
+  right: -16px;
+
+  min-width: 56px;
+  height: 56px;
+
+  background: #F44336;
+  color: #fff;
+
+  font-size: 30px;
+  font-weight: 600;
+  z-index: 100;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
 }

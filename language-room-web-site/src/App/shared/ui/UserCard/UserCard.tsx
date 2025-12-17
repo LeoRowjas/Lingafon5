@@ -1,28 +1,54 @@
+import { useState } from "react";
 import styles from "./UsereCard.module.scss";
-import Avatars from '@assets/Avatar.png'
-
+import avatar from '@assets/Avatar.png'
+import { Link } from "react-router-dom";
 
 export const UserCard = () => {
+
+  const [invitesCount] = useState<number>(2);
+
+  const displayCount =
+    invitesCount > 9 ? "9+" : invitesCount.toString();
+
   return (
     <div className={styles.card}>
-    <div className={styles.rectangle}>
-    
-      <div className={styles.wrapper}>
-        <div className={styles.blogAuthor}>
-            <img
-          src={Avatars}
-          alt="avatar"
-          className={styles.avatar}
-        />
 
-        <div>
-          <p className={styles.name}>ФИО: Александр Сергеевич Пушкин</p>
-          <p className={styles.teacher}>Преподаватель: Козлова Софья Владимировна</p>
+        <h1>Личный кабинет</h1>
+
+        <div className={styles.avatar}>
+
+          <div className="">
+              <h4>Личная информация</h4>
+              <p>ФИО</p>
+              <h3>Смирнов Александр Викторович</h3>
+              <p>Должность</p>
+              <h3>Преподаватель английского языка</h3>
+          </div>
+
+          <div className={styles.imgAvatar}>
+            <img src={avatar} alt="" />
+          </div>
+
         </div>
+
+        <div className={styles.buttonFooter}>
+          
+
+          <Link to="" className={styles.buttonBlue}>
+          Статистика заданий
+          </Link>
+          <Link to="/create-chat" className={styles.buttonGreen} >
+          Отправить приглашение
+          </Link>
+          <div className={styles.buttonWithBadge}>
+            {invitesCount > 0 && (
+              <span className={styles.badge}>{displayCount}</span>
+            )}
+            <Link to="" className={styles.buttonOrange}>
+              Входящие приглашения
+            </Link>
+          </div>
         </div>
-        <a className={styles.group}>Учебная группа: АТ-01</a>
-      </div>
-      </div>
     </div>
   );
 };
