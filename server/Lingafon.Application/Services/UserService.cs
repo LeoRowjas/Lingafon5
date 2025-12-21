@@ -13,12 +13,18 @@ public class UserService : IUserService
     private readonly IFileStorageService _storageService;
     private readonly IUserRepository _repository;
     private readonly IMapper _mapper;
+    private readonly StorageSettings _storageSettings;
 
-    public UserService(IUserRepository repository, IMapper mapper, IFileStorageService storageService)
+    public UserService(
+        IUserRepository repository,
+        IMapper mapper, 
+        IFileStorageService storageService,
+        IOptions<StorageSettings> storageSettings)
     {
         _repository = repository;
         _mapper = mapper;
         _storageService = storageService;
+        _storageSettings = storageSettings.Value;
     }
 
     public async Task<UserReadDto?> GetByIdAsync(Guid id)
@@ -64,13 +70,13 @@ public class UserService : IUserService
         var user = await _repository.GetByIdAsync(id);
         if (user is null)
             return null;
-        
-        if(!string.IsNullOrEmpty(user.AvatarUrl))
-            await _storageService.DeleteFileAsync(user.AvatarUrl);
 
-        var path = await _storageService.UploadFileAsync(fileStream, fileName, contentType);
+        if (!string.IsNullOrEmpty(user.AvatarUrl))
+            await _storageService.DeleteFileAsync(user.AvatarUrl, _storageSettings.BucketNameAvatars);
+
+        var path = await _storageService.UploadFileAsync(fileStream, fileName, contentType, _storageSettings.BucketNameAvatars);
         await _repository.UpdateAvatarUrlAsync(id, path);
-        
+
         return path;
     }
 
@@ -79,7 +85,7 @@ public class UserService : IUserService
         var user = await _repository.GetByIdAsync(id);
         if (user is null)
             return false;
-        await _storageService.DeleteFileAsync(user.AvatarUrl);
+        await _storageService.DeleteFileAsync(user.AvatarUrl, _storageSettings.BucketNameAvatars);
         return await _repository.DeleteAvatarAsync(id);
     }
 }

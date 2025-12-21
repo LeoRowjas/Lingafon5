@@ -42,6 +42,7 @@ public class Program
                 Version = "v1",
                 Description = "API for Lingafon cabinet, team 5.",
             });
+          
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Description = "Введите токен в формате: Bearer {токен}",
@@ -50,7 +51,6 @@ public class Program
                 Type = SecuritySchemeType.ApiKey,
                 Scheme = "Bearer"
             });
-
             options.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
@@ -84,7 +84,7 @@ public class Program
             });
         builder.Services.AddAuthorization();
         
-        builder.Services.AddApplicationServices(); //Register Application layer services
+        builder.Services.AddApplicationServices(builder.Configuration); //Register Application layer services
         builder.Services.AddInfrastructureServices(builder.Configuration); //Register Infrastructure layer services
 
         var app = builder.Build();

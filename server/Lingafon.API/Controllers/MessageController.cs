@@ -1,7 +1,10 @@
 using Lingafon.Application.DTOs.FromEntities;
+using Lingafon.Application.DTOs;
 using Lingafon.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using Lingafon.API.Models;
 
 namespace Lingafon.API.Controllers;
 
@@ -40,8 +43,68 @@ public class MessageController : ControllerBase
     [HttpPost("")]
     public async Task<IActionResult> CreateMessage([FromBody] MessageCreateDto message)
     {
-        var created = await _service.CreateAsync(message);
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier) ?? User.FindFirst("sub");
+        if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var senderId)) 
+            return Unauthorized();
+        
+        var dto = message with { SenderId = senderId };
+        var created = await _service.CreateAsync(dto);
         return Ok(created);
+    }
+
+    [Authorize]
+    [HttpPost("voice")]
+    public async Task<IActionResult> CreateVoiceMessage([FromForm] VoiceMessageCreateRequest request)
+    {
+        if (request?.File == null) 
+            return BadRequest("File is required");
+        
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier) ?? User.FindFirst("sub");
+        if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var senderId)) 
+            return Unauthorized();
+
+        await using var ms = new MemoryStream();
+        await request.File.CopyToAsync(ms);
+        ms.Seek(0, SeekOrigin.Begin);
+
+        var dto = new VoiceMessageCreateDto
+        {
+            DialogId = request.DialogId,
+            SenderId = senderId,
+            AudioStream = ms,
+            FileName = request.File.FileName,
+            ContentType = request.File.ContentType
+        };
+
+        var transcription = await _service.CreateVoiceAsync(dto);
+        return Ok(new { Transcription = transcription });
+    }
+
+    [Authorize]
+    [HttpPost("ai-reply")]
+    public async Task<IActionResult> GetAiReply([FromBody] AiReplyRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.UserMessage))
+            return BadRequest("User message is required");
+
+        if (request.DialogId == Guid.Empty)
+            return BadRequest("Dialog ID is required");
+
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier) ?? User.FindFirst("sub");
+        if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
+            return Unauthorized();
+
+        if (request.HistoryLimit <= 0)
+            request.HistoryLimit = 10;
+        if (request.HistoryLimit > 50)
+            request.HistoryLimit = 50;
+
+        var response = await _service.GetAiReplyAsync(userId, request);
+
+        if (!response.Success)
+            return BadRequest(response);
+
+        return Ok(response);
     }
 
     [Authorize]
@@ -60,4 +123,3 @@ public class MessageController : ControllerBase
         return Ok(isDeleted);
     }
 }
-

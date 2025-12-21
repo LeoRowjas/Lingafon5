@@ -1,8 +1,10 @@
 using AutoMapper;
 using Lingafon.Application.DTOs.FromEntities;
+using Lingafon.Application.DTOs;
 using Lingafon.Application.Interfaces.Services;
 using Lingafon.Core.Entities;
 using Lingafon.Core.Interfaces.Repositories;
+using Lingafon.Core.Interfaces.Services;
 
 namespace Lingafon.Application.Services;
 
@@ -10,19 +12,30 @@ public class MessageService : IMessageService
 {
     private readonly IMessageRepository _repository;
     private readonly IMapper _mapper;
+    private readonly IAiSpeechService _speechService;
+    private readonly IAiChatService _aiChatService;
+    private readonly IFileStorageService _fileService;
+    private readonly StorageSettings _storageSettings;
 
-    public MessageService(IMessageRepository repository, IMapper mapper)
+    public MessageService(IMessageRepository repository,
+        IMapper mapper,
+        IAiSpeechService speechService,
+        IAiChatService aiChatService,
+        IFileStorageService fileService,
+        StorageSettings storageSettings)
     {
         _repository = repository;
         _mapper = mapper;
+        _speechService = speechService;
+        _aiChatService = aiChatService;
+        _fileService = fileService;
+        _storageSettings = storageSettings;
     }
 
     public async Task<MessageReadDto?> GetByIdAsync(Guid id)
     {
         var message = await _repository.GetByIdAsync(id);
-        if (message is null)
-            return null;
-        return _mapper.Map<MessageReadDto>(message);
+        return message == null ? null : _mapper.Map<MessageReadDto>(message);
     }
 
     public async Task<IEnumerable<MessageReadDto>> GetAllAsync()
@@ -36,6 +49,45 @@ public class MessageService : IMessageService
         var message = _mapper.Map<Message>(dto);
         await _repository.AddAsync(message);
         return _mapper.Map<MessageReadDto>(message);
+    }
+
+    public async Task<string> CreateVoiceAsync(VoiceMessageCreateDto dto)
+    {
+        var tempPath = Path.Combine(Path.GetTempPath(), $"lingafon_{Guid.NewGuid()}{Path.GetExtension(dto.FileName)}");
+        await using (var fs = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None))
+        {
+            await dto.AudioStream.CopyToAsync(fs);
+        }
+        
+        string audioUrl;
+        await using (var uploadStream = new FileStream(tempPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+        {
+            audioUrl = await _fileService.UploadFileAsync(
+                uploadStream,
+                dto.FileName,
+                dto.ContentType,
+                _storageSettings.BucketNameAudio
+            );
+        }
+        
+        var transcription = await _speechService.GetTextFromSpeechAsync(tempPath) ?? string.Empty;
+
+        var message = new Message
+        {
+            Content = transcription,
+            SentAt = DateTime.UtcNow,
+            IsFromAi = false,
+            AudioUrl = audioUrl,
+            DialogId = dto.DialogId,
+            SenderId = dto.SenderId
+        };
+
+        await _repository.AddAsync(message);
+
+        try { File.Delete(tempPath); }
+        catch { }
+
+        return transcription;
     }
 
     public async Task UpdateAsync(MessageCreateDto dto)
@@ -54,5 +106,80 @@ public class MessageService : IMessageService
         var messages = await _repository.GetByDialogIdAsync(dialogId);
         return _mapper.Map<IEnumerable<MessageReadDto>>(messages);
     }
-}
 
+    public async Task<AiReplyResponse> GetAiReplyAsync(Guid userId, AiReplyRequest request)
+    {
+        try
+        {
+            var messages = await _repository.GetByDialogIdAsync(request.DialogId);
+            var messageList = messages.ToList();
+
+            var conversationHistory = new List<(string role, string content)>();
+            
+            if (request.IncludeHistory && messageList.Count > 0)
+            {
+                var historyMessages = messageList
+                    .OrderByDescending(m => m.SentAt)
+                    .Take(request.HistoryLimit)
+                    .OrderBy(m => m.SentAt)
+                    .ToList();
+
+                foreach (var msg in historyMessages)
+                {
+                    var role = msg.IsFromAi ? "assistant" : "user";
+                    conversationHistory.Add((role, msg.Content));
+                }
+            }
+
+            conversationHistory.Add(("user", request.UserMessage));
+
+            var systemPrompt = request.SystemPrompt ?? GetDefaultSystemPrompt();
+            var aiReply = await _aiChatService.GetReplyAsync(systemPrompt, conversationHistory);
+
+            if (string.IsNullOrEmpty(aiReply))
+            {
+                return new AiReplyResponse
+                {
+                    Success = false,
+                    ErrorMessage = "AI service returned an empty response",
+                    DialogId = request.DialogId,
+                    ReplyAt = DateTime.UtcNow
+                };
+            }
+
+            var aiMessage = new Message
+            {
+                Content = aiReply,
+                SentAt = DateTime.UtcNow,
+                IsFromAi = true,
+                DialogId = request.DialogId,
+                SenderId = userId
+            };
+
+            await _repository.AddAsync(aiMessage);
+
+            return new AiReplyResponse
+            {
+                Reply = aiReply,
+                DialogId = request.DialogId,
+                ReplyAt = DateTime.UtcNow,
+                Success = true
+            };
+        }
+        catch (Exception ex)
+        {
+            return new AiReplyResponse
+            {
+                Success = false,
+                ErrorMessage = ex.Message,
+                DialogId = request.DialogId,
+                ReplyAt = DateTime.UtcNow
+            };
+        }
+    }
+
+    private string GetDefaultSystemPrompt()
+    {
+        return "You are a helpful language learning assistant. Be encouraging, patient, and provide corrections when needed.";
+    }
+}

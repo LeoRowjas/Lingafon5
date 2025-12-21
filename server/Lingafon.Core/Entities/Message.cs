@@ -9,6 +9,7 @@ public class Message : BaseEntity
     public string Content { get; set; }
     public DateTime SentAt { get; set; }
     public bool IsFromAi { get; set; }
+    public string AudioUrl { get; set; } = string.Empty;
     [Required]
     public Guid DialogId { get; set; }
     [Required]
