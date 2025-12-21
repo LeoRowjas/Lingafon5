@@ -12,3 +12,15 @@ public record DialogCreateDto
     public Guid SecondUserId { get; init; }
 }
 
+public record DialogCreateWithAiDto
+{
+    public string Title { get; init; } = string.Empty;
+}
+
+public record DialogCreateWithUserDto
+{
+    public string Title { get; init; } = string.Empty;
+    public DialogType Type { get; init; }
+    public Guid SecondUserId { get; init; }
+}
+

@@ -16,6 +16,16 @@ public class DialogController : ControllerBase
         _service = service;
     }
 
+    private Guid GetUserIdFromClaims()
+    {
+        var userIdClaim = User.FindFirst("sub")?.Value ?? User.FindFirst("nameid")?.Value;
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+        {
+            throw new UnauthorizedAccessException("User ID not found in claims");
+        }
+        return userId;
+    }
+
     [HttpGet("")]
     public async Task<IActionResult> GetAll([FromQuery] Guid? userId)
     {
@@ -41,6 +51,31 @@ public class DialogController : ControllerBase
     public async Task<IActionResult> CreateDialog([FromBody] DialogCreateDto dialog)
     {
         var created = await _service.CreateAsync(dialog);
+        return Ok(created);
+    }
+
+    [Authorize]
+    [HttpPost("with-user")]
+    public async Task<IActionResult> CreateDialogWithUser([FromBody] DialogCreateWithUserDto dto)
+    {
+        var currentUserId = GetUserIdFromClaims();
+        var dialogDto = new DialogCreateDto
+        {
+            Title = dto.Title,
+            Type = dto.Type,
+            FirstUserId = currentUserId,
+            SecondUserId = dto.SecondUserId
+        };
+        var created = await _service.CreateAsync(dialogDto);
+        return Ok(created);
+    }
+
+    [Authorize]
+    [HttpPost("ai")]
+    public async Task<IActionResult> CreateDialogWithAi([FromBody] DialogCreateWithAiDto dto)
+    {
+        var currentUserId = GetUserIdFromClaims();
+        var created = await _service.CreateWithAiAsync(dto, currentUserId);
         return Ok(created);
     }
 

@@ -2,6 +2,7 @@ using AutoMapper;
 using Lingafon.Application.DTOs.FromEntities;
 using Lingafon.Application.Interfaces.Services;
 using Lingafon.Core.Entities;
+using Lingafon.Core.Enums;
 using Lingafon.Core.Interfaces.Repositories;
 
 namespace Lingafon.Application.Services;
@@ -53,6 +54,20 @@ public class DialogService : IDialogService
     {
         var dialogs = await _repository.GetByUserIdAsync(userId);
         return _mapper.Map<IEnumerable<DialogReadDto>>(dialogs);
+    }
+
+    public async Task<DialogReadDto> CreateWithAiAsync(DialogCreateWithAiDto dto, Guid userId)
+    {
+        var dialog = new Dialog
+        {
+            Title = dto.Title,
+            Type = DialogType.Ai,
+            FirstUserId = userId,
+            SecondUserId = Guid.Empty,
+            CreatedAt = DateTime.UtcNow
+        };
+        await _repository.AddAsync(dialog);
+        return _mapper.Map<DialogReadDto>(dialog);
     }
 }
 
