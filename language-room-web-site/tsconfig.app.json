@@ -17,13 +17,15 @@
     "jsx": "react-jsx",
 
     /* Aliases */
-    "baseUrl": "./src",
+    "baseUrl": "./",
     "paths": {
-      "@assets/*": ["assets/*"],
-      "@entities/*": ["App/entities/*"],
-      "@features/*": ["App/features/*"],
-      "@pages/*": ["App/pages/*"],
-      "@ui/*": ["App/shared/ui/*"]
+      "@assets/*": ["src/assets/*"],
+      "@entities/*": ["src/App/entities/*"],
+      "@features/*": ["src/App/features/*"],
+      "@pages/*": ["src/App/pages/*"],
+      "@ui/*": ["src/App/shared/ui/*"],
+      "@shared/*": ["src/App/shared/*"],
+      "@api/*": ["src/api/*"],
     },
 
     /* Linting */

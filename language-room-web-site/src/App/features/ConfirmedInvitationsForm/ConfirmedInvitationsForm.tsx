@@ -1,22 +1,11 @@
 import styles from "./../SelectRoleForm/SelectRoleForm.module.scss";
 import bgImage from "@assets/bgLogin.png";
 import { useStudentChoice } from "@entities/ChatSelectionContext";
-import clockImg from '@assets/clok.png'
-import { sendChatInvite } from "@shared/mock/chatEvents.mock";
-import {Link} from 'react-router-dom'
+import applayImg from '@assets/applay.png'
 
-export function LoadingInvitationsForm () {
+export function ConfirmedInvitationsForm () {
 
     const { choice } = useStudentChoice();
-
-    const handleInvite = () => {
-        sendChatInvite({
-            from: "studentA",
-            to: choice.student?.id,
-            theme: choice.theme,
-            role: choice.role,
-    });
-    };
 
     return(
         <div className={styles.bg}>
@@ -61,12 +50,12 @@ export function LoadingInvitationsForm () {
 
 
                     <div className={styles.mainShow}>
-                        <img className={styles.clockImg} src={clockImg} alt="" />
+                        <img className={styles.clockImg} src={applayImg} alt="" />
                         <p className={styles.subtitleMain}>
-                            Выберите студента для приглашения
+                            Приглашение принято!
                         </p>
 
-                        <div className={styles.summary}>
+                        <div className={styles.summaryConfirmed}>
 
                             <div className={styles.summaryItem}>
                             <span>Приглашение отправлено:</span>
@@ -84,9 +73,7 @@ export function LoadingInvitationsForm () {
                             </div>
 
                         </div>
-                        <p>Ожидаем ответа от студента...</p>
-                        <button className={styles.buttonRed}><Link to='/profile'>Отмена</Link></button>
-                        
+                        <button className={styles.buttonGreen}>Перейти к образцу диалога</button>
                     </div>
                 </section>
             </div>

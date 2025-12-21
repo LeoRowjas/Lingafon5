@@ -17,7 +17,9 @@ export default defineConfig({
       '@entities': path.resolve(__dirname, 'src/App/entities'),
       '@features': path.resolve(__dirname, 'src/App/features'),
       '@pages': path.resolve(__dirname, 'src/App/pages'),
-      '@ui': path.resolve(__dirname, 'src/App/shared/ui')
+      '@ui': path.resolve(__dirname, 'src/App/shared/ui'),
+      '@shared': path.resolve(__dirname, 'src/App/shared'),
+      '@api': path.resolve(__dirname, 'src/api')
     },
   },
 })

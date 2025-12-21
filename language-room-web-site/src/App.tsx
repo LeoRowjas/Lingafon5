@@ -9,6 +9,8 @@ import {CreateChat} from '@pages/CreateChat/CreateChat'
 import {SelectRole} from '@pages/SelectRole/SelectRole'
 import {StudentChoice} from '@pages/StudentChoice/StudentChoice'
 import {LoadingInvitations} from '@pages/loadingInvitations/loadingInvitations'
+import {ConfirmedInvitations} from '@pages/ConfirmedInvitations/ConfirmedInvitations'
+import {TaskStatistics} from '@pages/TaskStatistics/TaskStatistics'
 export function App() {
   const [count, setCount] = useState(0)
 
@@ -21,6 +23,8 @@ export function App() {
       <Route path="/select-role" element={<SelectRole />} />
       <Route path="/student-choice" element={<StudentChoice />} />
       <Route path="/loading-in" element={<LoadingInvitations />} />
+      <Route path="/confirm-in" element={<ConfirmedInvitations />} />
+      <Route path="/task" element={<TaskStatistics />} />
     </Routes>
   )
 }

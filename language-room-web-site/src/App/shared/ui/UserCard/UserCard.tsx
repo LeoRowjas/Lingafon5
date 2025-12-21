@@ -34,7 +34,7 @@ export const UserCard = () => {
         <div className={styles.buttonFooter}>
           
 
-          <Link to="" className={styles.buttonBlue}>
+          <Link to="/task" className={styles.buttonBlue}>
           Статистика заданий
           </Link>
           <Link to="/create-chat" className={styles.buttonGreen} >
