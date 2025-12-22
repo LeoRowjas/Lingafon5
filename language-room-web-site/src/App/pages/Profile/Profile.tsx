@@ -1,5 +1,4 @@
 import { UserInfoCard } from '@features/UserInfoCard/UserInfoCard'
-import ProfileIcon from '@assets/profile.svg'
 
 export function Profile() {
     return(

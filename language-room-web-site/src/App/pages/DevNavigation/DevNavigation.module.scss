@@ -1,0 +1,80 @@
+// DevNavigation.module.scss
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 80px 20px 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card {
+  max-width: 1000px;
+  width: 100%;
+  background: white;
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 8px;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #666;
+  margin: 0 0 40px;
+  text-align: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+
+  &:hover {
+    background: #667eea;
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+
+    .linkText {
+      color: white;
+    }
+
+    .linkPath {
+      color: rgba(255, 255, 255, 0.8);
+    }
+  }
+}
+
+.linkText {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  transition: color 0.2s;
+}
+
+.linkPath {
+  font-size: 13px;
+  color: #999;
+  font-family: 'Courier New', monospace;
+  transition: color 0.2s;
+}

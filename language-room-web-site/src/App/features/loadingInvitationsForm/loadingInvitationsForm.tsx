@@ -85,7 +85,7 @@ export function LoadingInvitationsForm () {
 
                         </div>
                         <p>Ожидаем ответа от студента...</p>
-                        <button className={styles.buttonRed}><Link to='/profile'>Отмена</Link></button>
+                        <button className={styles.buttonRed}><Link to='/dialog'>Отмена</Link></button>
                         
                     </div>
                 </section>

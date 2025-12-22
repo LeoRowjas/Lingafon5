@@ -11,11 +11,20 @@ import {StudentChoice} from '@pages/StudentChoice/StudentChoice'
 import {LoadingInvitations} from '@pages/loadingInvitations/loadingInvitations'
 import {ConfirmedInvitations} from '@pages/ConfirmedInvitations/ConfirmedInvitations'
 import {TaskStatistics} from '@pages/TaskStatistics/TaskStatistics'
+import {Chat} from '@pages/Chat/Chat'
+import {Dialog} from '@pages/Dialog/Dialog'
+
+import { Header } from '@ui/Header/Header'
+import { DevNavigation } from '@pages/DevNavigation/DevNavigation'
 export function App() {
+  
   const [count, setCount] = useState(0)
 
   return (
+    <>
+    <Header />
     <Routes>
+      <Route path="/" element={<DevNavigation />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Registration />} />
       <Route path="/profile" element={<Profile />} />
@@ -25,7 +34,10 @@ export function App() {
       <Route path="/loading-in" element={<LoadingInvitations />} />
       <Route path="/confirm-in" element={<ConfirmedInvitations />} />
       <Route path="/task" element={<TaskStatistics />} />
+      <Route path="/chat/:id" element={<Chat />} />
+      <Route path="/dialog" element={<Dialog />} />
     </Routes>
+    </>
   )
 }
 

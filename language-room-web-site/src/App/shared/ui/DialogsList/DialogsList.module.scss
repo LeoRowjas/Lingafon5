@@ -69,8 +69,21 @@
 }
 
 .info {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 20px;
+  margin-top: 16px;
+}
+
+.infoItem {
   display: flex;
-  gap: 32px;
+  flex-direction: column;
+  gap: 8px;
+  
+  &:nth-child(4) {
+    opacity: 0;
+    visibility: hidden;
+  }
 }
 
 .label {
@@ -80,18 +93,7 @@
   margin-bottom: 4px;
 }
 
-.progress {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
 
-.bar {
-  width: 80px;
-  height: 4px;
-  background: #22c55e;
-  border-radius: 4px;
-}
 
 .avatar {
   width: 64px;
@@ -104,3 +106,33 @@
   justify-content: center;
   font-size: 12px;
 }
+
+
+// DialogsList.module.scss
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.track {
+  flex: 1;
+  height: 8px;
+  background-color: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  min-width: 100px; // Добавляем минимальную ширину
+}
+
+
+.progressText {
+  min-width: 40px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #1f2937;
+}
+
+

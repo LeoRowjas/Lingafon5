@@ -15,9 +15,9 @@ export function DialogsListForm() {
 
                     <div className={styles.cardBg}>
                     <h3 className={styles.cardText}>Список диалогов</h3>
-                    <div className={styles.cardForm}>
-                        <DialogsList/>
-                    </div>
+                        <div className={styles.cardForm}>
+                            <DialogsList/>
+                        </div>
                 </div>
                 </div>
             </div>

@@ -20,9 +20,9 @@ export const UserCard = () => {
           <div className="">
               <h4>Личная информация</h4>
               <p className={styles.subText}>ФИО</p>
-              <h3>Смирнов Александр Викторович</h3>
-              <p className={styles.subText}>Должность</p>
-              <h3>Преподаватель английского языка</h3>
+              <h3>Иванов Иван Иванович</h3>
+              <p className={styles.subText}>Учебная группа</p>
+              <h3>ГР-2024-01</h3>
           </div>
 
           <div className={styles.imgAvatar}>

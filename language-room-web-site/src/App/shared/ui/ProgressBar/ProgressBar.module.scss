@@ -1,0 +1,42 @@
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bar {
+  width: 80px;
+  height: 4px;
+  background: #22c55e;
+  border-radius: 4px;
+}
+
+.track {
+  flex: 1;
+  height: 8px;
+  background-color: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  min-width:100px; // Добавляем минимальную ширину
+}
+
+.bar {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  border-radius: 4px;
+  transition: width 0.5s ease-in-out;
+  
+  // Градиент по проценту
+  &[style*="width: 100%"] {
+    background: linear-gradient(90deg, #10b981, #34d399);
+  }
+  
+  &[style*="width: 7"] {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  }
+  
+  &[style*="width: 6"] {
+    background: linear-gradient(90deg, #ef4444, #f87171);
+  }
+}
