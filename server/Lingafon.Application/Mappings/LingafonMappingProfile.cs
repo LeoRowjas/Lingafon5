@@ -29,5 +29,9 @@ public class LingafonMappingProfile : Profile
         // AssignmentResult mappings
         CreateMap<AssignmentResult, AssignmentResultReadDto>();
         CreateMap<AssignmentResultCreateDto, AssignmentResult>();
+        
+        //InviteLink mappings
+        CreateMap<InviteLink, InviteLinkReadDto>();
+        CreateMap<InviteLinkCreateDto, InviteLink>();
     }
 }

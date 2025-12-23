@@ -18,6 +18,7 @@ public static class ApplicationServiceRegistration
         services.AddScoped<IMessageService, MessageService>();
         services.AddScoped<IAssignmentResultService, AssignmentResultService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IInviteLinkService, InviteLinkService>();
         
         services.Configure<StorageSettings>(configuration.GetSection("S3Settings"));
         services.AddSingleton(sp => sp.GetRequiredService<IOptions<StorageSettings>>().Value);

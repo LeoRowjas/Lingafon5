@@ -29,6 +29,9 @@ public class UserService : IUserService
 
     public async Task<UserReadDto?> GetByIdAsync(Guid id)
     {
+        if (id == Guid.Empty)
+            throw new ArgumentException("Id cannot be empty", nameof(id));
+
         var user = await _repository.GetByIdAsync(id);
         return user is null ? null : _mapper.Map<UserReadDto>(user);
     }
@@ -41,6 +44,9 @@ public class UserService : IUserService
 
     public async Task<UserReadDto> CreateAsync(UserCreateDto dto)
     {
+        if (dto == null)
+            throw new ArgumentNullException(nameof(dto));
+
         var user = _mapper.Map<User>(dto);
         await _repository.AddAsync(user);
         return _mapper.Map<UserReadDto>(user);
@@ -48,17 +54,26 @@ public class UserService : IUserService
 
     public async Task UpdateAsync(UserUpdateDto dto)
     {
+        if (dto == null)
+            throw new ArgumentNullException(nameof(dto));
+
         var user = _mapper.Map<User>(dto);
         await _repository.UpdateAsync(user);
     }
 
     public async Task<bool> DeleteAsync(Guid id)
     {
+        if (id == Guid.Empty)
+            throw new ArgumentException("Id cannot be empty", nameof(id));
+
         return await _repository.DeleteAsync(id);
     }
 
     public async Task<UserReadDto?> GetByEmailAsync(string email)
     {
+        if (string.IsNullOrWhiteSpace(email))
+            throw new ArgumentException("Email cannot be empty", nameof(email));
+
         var user = await _repository.GetByEmailAsync(email);
         if (user is null)
             return null;
@@ -67,6 +82,15 @@ public class UserService : IUserService
 
     public async Task<string?> UpdateAvatarUrlAsync(Guid id, Stream fileStream, string fileName, string contentType)
     {
+        if (id == Guid.Empty)
+            throw new ArgumentException("Id cannot be empty", nameof(id));
+        if (fileStream == null)
+            throw new ArgumentNullException(nameof(fileStream));
+        if (string.IsNullOrWhiteSpace(fileName))
+            throw new ArgumentException("FileName cannot be empty", nameof(fileName));
+        if (string.IsNullOrWhiteSpace(contentType))
+            throw new ArgumentException("ContentType cannot be empty", nameof(contentType));
+
         var user = await _repository.GetByIdAsync(id);
         if (user is null)
             return null;
@@ -82,6 +106,9 @@ public class UserService : IUserService
 
     public async Task<bool> DeleteAvatarAsync(Guid id)
     {
+        if (id == Guid.Empty)
+            throw new ArgumentException("Id cannot be empty", nameof(id));
+
         var user = await _repository.GetByIdAsync(id);
         if (user is null)
             return false;

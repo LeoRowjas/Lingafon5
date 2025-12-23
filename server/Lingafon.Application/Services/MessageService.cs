@@ -34,6 +34,9 @@ public class MessageService : IMessageService
 
     public async Task<MessageReadDto?> GetByIdAsync(Guid id)
     {
+        if (id == Guid.Empty)
+            throw new ArgumentException("Id cannot be empty", nameof(id));
+
         var message = await _repository.GetByIdAsync(id);
         return message == null ? null : _mapper.Map<MessageReadDto>(message);
     }
@@ -46,6 +49,9 @@ public class MessageService : IMessageService
 
     public async Task<MessageReadDto> CreateAsync(MessageCreateDto dto)
     {
+        if (dto == null)
+            throw new ArgumentNullException(nameof(dto));
+
         var message = _mapper.Map<Message>(dto);
         await _repository.AddAsync(message);
         return _mapper.Map<MessageReadDto>(message);
@@ -92,17 +98,26 @@ public class MessageService : IMessageService
 
     public async Task UpdateAsync(MessageCreateDto dto)
     {
+        if (dto == null)
+            throw new ArgumentNullException(nameof(dto));
+
         var message = _mapper.Map<Message>(dto);
         await _repository.UpdateAsync(message);
     }
 
     public async Task<bool> DeleteAsync(Guid id)
     {
+        if (id == Guid.Empty)
+            throw new ArgumentException("Id cannot be empty", nameof(id));
+
         return await _repository.DeleteAsync(id);
     }
 
     public async Task<IEnumerable<MessageReadDto>> GetByDialogAsync(Guid dialogId)
     {
+        if (dialogId == Guid.Empty)
+            throw new ArgumentException("DialogId cannot be empty", nameof(dialogId));
+
         var messages = await _repository.GetByDialogIdAsync(dialogId);
         return _mapper.Map<IEnumerable<MessageReadDto>>(messages);
     }

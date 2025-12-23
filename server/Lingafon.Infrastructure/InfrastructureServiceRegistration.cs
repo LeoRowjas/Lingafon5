@@ -49,6 +49,8 @@ public static class InfrastructureServiceRegistration
         services.AddScoped<IDialogRepository, DialogRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IInviteLinkRepository, InviteLinkRepository>();
+        services.AddScoped<ITeacherStudentRepository, TeacherStudentRepository>();
 
         services.AddScoped<IFileStorageService, S3FileStorageService>();
         
