@@ -19,6 +19,19 @@ public class MessageController : ControllerBase
         _service = service;
     }
 
+    private Guid GetUserIdFromClaims()
+    {
+        var userIdClaim = User.FindFirst("sub")?.Value 
+            ?? User.FindFirst("nameid")?.Value 
+            ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+        {
+            throw new UnauthorizedAccessException("User ID not found in claims");
+        }
+        return userId;
+    }
+    
     [HttpGet("")]
     public async Task<IActionResult> GetAll([FromQuery] Guid? dialogId)
     {
@@ -43,10 +56,7 @@ public class MessageController : ControllerBase
     [HttpPost("")]
     public async Task<IActionResult> CreateMessage([FromBody] MessageCreateDto message)
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier) ?? User.FindFirst("sub");
-        if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var senderId)) 
-            return Unauthorized();
-        
+        var senderId = GetUserIdFromClaims();
         var dto = message with { SenderId = senderId };
         var created = await _service.CreateAsync(dto);
         return Ok(created);
@@ -58,13 +68,12 @@ public class MessageController : ControllerBase
     {
         if (request?.File == null) 
             return BadRequest("File is required");
-        
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier) ?? User.FindFirst("sub");
-        if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var senderId)) 
-            return Unauthorized();
+
+        var file = request.File;
+        var senderId = GetUserIdFromClaims();
 
         await using var ms = new MemoryStream();
-        await request.File.CopyToAsync(ms);
+        await file.CopyToAsync(ms);
         ms.Seek(0, SeekOrigin.Begin);
 
         var dto = new VoiceMessageCreateDto
@@ -72,8 +81,8 @@ public class MessageController : ControllerBase
             DialogId = request.DialogId,
             SenderId = senderId,
             AudioStream = ms,
-            FileName = request.File.FileName,
-            ContentType = request.File.ContentType
+            FileName = file.FileName,
+            ContentType = file.ContentType
         };
 
         var transcription = await _service.CreateVoiceAsync(dto);
@@ -84,15 +93,11 @@ public class MessageController : ControllerBase
     [HttpPost("ai-reply")]
     public async Task<IActionResult> GetAiReply([FromBody] AiReplyRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.UserMessage))
-            return BadRequest("User message is required");
 
         if (request.DialogId == Guid.Empty)
             return BadRequest("Dialog ID is required");
 
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier) ?? User.FindFirst("sub");
-        if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
-            return Unauthorized();
+        var userId = GetUserIdFromClaims();
 
         if (request.HistoryLimit <= 0)
             request.HistoryLimit = 10;

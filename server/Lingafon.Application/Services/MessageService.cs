@@ -114,9 +114,36 @@ public class MessageService : IMessageService
             var messages = await _repository.GetByDialogIdAsync(request.DialogId);
             var messageList = messages.ToList();
 
+            if (messageList.Count == 0)
+            {
+                return new AiReplyResponse
+                {
+                    Success = false,
+                    ErrorMessage = "No messages in dialog to process",
+                    DialogId = request.DialogId,
+                    ReplyAt = DateTime.UtcNow
+                };
+            }
+
+            var lastUserMessage = messageList
+                .Where(m => !m.IsFromAi)
+                .OrderByDescending(m => m.SentAt)
+                .FirstOrDefault();
+
+            if (lastUserMessage == null)
+            {
+                return new AiReplyResponse
+                {
+                    Success = false,
+                    ErrorMessage = "No user messages found in dialog",
+                    DialogId = request.DialogId,
+                    ReplyAt = DateTime.UtcNow
+                };
+            }
+
             var conversationHistory = new List<(string role, string content)>();
             
-            if (request.IncludeHistory && messageList.Count > 0)
+            if (request.IncludeHistory && messageList.Count > 1)
             {
                 var historyMessages = messageList
                     .OrderByDescending(m => m.SentAt)
@@ -130,10 +157,12 @@ public class MessageService : IMessageService
                     conversationHistory.Add((role, msg.Content));
                 }
             }
+            else
+            {
+                conversationHistory.Add(("user", lastUserMessage.Content));
+            }
 
-            conversationHistory.Add(("user", request.UserMessage));
-
-            var systemPrompt = request.SystemPrompt ?? GetDefaultSystemPrompt();
+            var systemPrompt = GetTeacherSystemPrompt();
             var aiReply = await _aiChatService.GetReplyAsync(systemPrompt, conversationHistory);
 
             if (string.IsNullOrEmpty(aiReply))
@@ -147,11 +176,25 @@ public class MessageService : IMessageService
                 };
             }
 
+            Console.WriteLine($"[MessageService] Got AI reply: {aiReply.Substring(0, Math.Min(50, aiReply.Length))}...");
+            
+            var audioUrl = await _speechService.GetSpeechFromTextAsync(aiReply);
+            
+            if (string.IsNullOrEmpty(audioUrl))
+            {
+                Console.WriteLine($"[MessageService] Warning: Audio URL is empty after TTS conversion");
+            }
+            else
+            {
+                Console.WriteLine($"[MessageService] Audio URL generated: {audioUrl}");
+            }
+
             var aiMessage = new Message
             {
                 Content = aiReply,
                 SentAt = DateTime.UtcNow,
                 IsFromAi = true,
+                AudioUrl = audioUrl ?? string.Empty,
                 DialogId = request.DialogId,
                 SenderId = userId
             };
@@ -161,6 +204,7 @@ public class MessageService : IMessageService
             return new AiReplyResponse
             {
                 Reply = aiReply,
+                AudioUrl = audioUrl,
                 DialogId = request.DialogId,
                 ReplyAt = DateTime.UtcNow,
                 Success = true
@@ -168,6 +212,8 @@ public class MessageService : IMessageService
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"[MessageService] Error in GetAiReplyAsync: {ex.Message}");
+            Console.WriteLine($"[MessageService] Stack trace: {ex.StackTrace}");
             return new AiReplyResponse
             {
                 Success = false,
@@ -178,8 +224,16 @@ public class MessageService : IMessageService
         }
     }
 
-    private string GetDefaultSystemPrompt()
+    private string GetTeacherSystemPrompt()
     {
-        return "You are a helpful language learning assistant. Be encouraging, patient, and provide corrections when needed.";
+        return @"You are an English language teacher. Your role is to:
+1. Correct any grammar, spelling, or punctuation mistakes the student makes
+2. Provide constructive feedback on their writing
+3. Explain corrections clearly
+4. Encourage the student to learn
+5. Continue the conversation naturally while maintaining the teaching role
+6. Be patient and supportive
+
+When correcting mistakes, explain why the correction is needed and provide the correct form.";
     }
 }

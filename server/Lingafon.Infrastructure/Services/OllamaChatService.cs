@@ -12,7 +12,7 @@ public class OllamaChatService : IAiChatService
     public OllamaChatService(HttpClient httpClient)
     {
         _httpClient = httpClient;
-        _model = "mistral";
+        _model = "phi:latest";
     }
 
     public async Task<string> GetReplyAsync(string systemPrompt, List<(string role, string content)> messages)

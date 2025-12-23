@@ -28,10 +28,10 @@ public static class AudioConversionHelper
 
             var extension = Path.GetExtension(inputPath).ToLower();
             
-            // For M4A/AAC files, use FFmpeg on Linux to avoid Windows Media Foundation issues
-            if ((extension == ".m4a" || extension == ".aac") && IsLinux())
+            // For MP3, M4A/AAC files on Linux, use FFmpeg to avoid Windows Media Foundation issues
+            if ((extension == ".mp3" || extension == ".m4a" || extension == ".aac") && IsLinux())
             {
-                Console.WriteLine($"[AudioConversionHelper] M4A/AAC detected on Linux, using FFmpeg...");
+                Console.WriteLine($"[AudioConversionHelper] {GetAudioFormatName(inputPath)} detected on Linux, using FFmpeg...");
                 return ConvertAudioWithFFmpeg(inputPath);
             }
 

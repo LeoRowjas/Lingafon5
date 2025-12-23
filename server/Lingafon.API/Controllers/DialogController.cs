@@ -2,6 +2,7 @@ using Lingafon.Application.DTOs.FromEntities;
 using Lingafon.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Lingafon.API.Controllers;
 
@@ -18,7 +19,10 @@ public class DialogController : ControllerBase
 
     private Guid GetUserIdFromClaims()
     {
-        var userIdClaim = User.FindFirst("sub")?.Value ?? User.FindFirst("nameid")?.Value;
+        var userIdClaim = User.FindFirst("sub")?.Value 
+            ?? User.FindFirst("nameid")?.Value 
+            ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
         if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
         {
             throw new UnauthorizedAccessException("User ID not found in claims");
@@ -44,14 +48,6 @@ public class DialogController : ControllerBase
     {
         var dialog = await _service.GetByIdAsync(id);
         return Ok(dialog);
-    }
-
-    [Authorize]
-    [HttpPost("")]
-    public async Task<IActionResult> CreateDialog([FromBody] DialogCreateDto dialog)
-    {
-        var created = await _service.CreateAsync(dialog);
-        return Ok(created);
     }
 
     [Authorize]

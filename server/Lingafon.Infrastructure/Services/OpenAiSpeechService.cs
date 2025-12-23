@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using Lingafon.Core.Interfaces.Services;
 using Lingafon.Infrastructure.Settings;
@@ -29,17 +30,21 @@ public class OpenAiSpeechService : IAiSpeechService
         {
             Console.WriteLine($"[OpenAiSpeechService] Processing audio file: {audioPath}");
 
-            // Validate audio format
+            if (string.IsNullOrEmpty(_modelPath) || !File.Exists(_modelPath))
+            {
+                Console.WriteLine($"[OpenAiSpeechService] Whisper model not available at {_modelPath}");
+                return null;
+            }
+
             if (!AudioConversionHelper.IsSupportedAudioFormat(audioPath))
             {
                 Console.WriteLine($"[OpenAiSpeechService] Unsupported audio format: {AudioConversionHelper.GetAudioFormatName(audioPath)}");
                 return null;
             }
-            
-            // Convert audio to 16KHz WAV format required by Whisper
+
             var processedAudioPath = AudioConversionHelper.ConvertToWhisperFormat(audioPath);
             Console.WriteLine($"[OpenAiSpeechService] Converted audio to: {processedAudioPath}");
-            
+
             using var factory = WhisperFactory.FromPath(_modelPath);
             await using var processor = factory.CreateBuilder().WithLanguage("auto").Build();
 
@@ -49,17 +54,16 @@ public class OpenAiSpeechService : IAiSpeechService
             {
                 sb.Append(segment.Text);
             }
-            
+
             var transcription = sb.ToString();
             Console.WriteLine($"[OpenAiSpeechService] Transcription result: {transcription}");
-            
-            // Clean up converted file if it's different from original
+
             if (processedAudioPath != audioPath && File.Exists(processedAudioPath))
             {
                 try { File.Delete(processedAudioPath); }
                 catch { }
             }
-            
+
             return transcription;
         }
         catch (Exception ex)
@@ -69,9 +73,138 @@ public class OpenAiSpeechService : IAiSpeechService
         }
     }
 
-
     public async Task<string?> GetSpeechFromTextAsync(string text)
     {
-        throw new NotImplementedException();
+        try
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return null;
+
+            Console.WriteLine($"[OpenAiSpeechService] Converting text to speech: {text.Substring(0, Math.Min(50, text.Length))}...");
+
+            var audioFileName = $"ai_reply_{Guid.NewGuid()}.wav";
+            var audioPath = Path.Combine(Path.GetTempPath(), audioFileName);
+
+            // Try espeak for Linux (Docker), fallback to say for macOS
+            var ttsCommand = GetTTSCommand(out var arguments);
+            
+            if (string.IsNullOrEmpty(ttsCommand))
+            {
+                Console.WriteLine($"[OpenAiSpeechService] No TTS command available (espeak or say not found)");
+                return null;
+            }
+
+            var process = new ProcessStartInfo
+            {
+                FileName = ttsCommand,
+                Arguments = string.Format(arguments, text, audioPath),
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
+            };
+
+            Console.WriteLine($"[OpenAiSpeechService] Executing: {ttsCommand} {process.Arguments}");
+
+            using (var proc = Process.Start(process))
+            {
+                if (proc != null)
+                {
+                    await proc.WaitForExitAsync();
+                    var error = await proc.StandardError.ReadToEndAsync();
+                    
+                    if (proc.ExitCode != 0)
+                    {
+                        Console.WriteLine($"[OpenAiSpeechService] TTS command error (exit code {proc.ExitCode}): {error}");
+                        return null;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"[OpenAiSpeechService] Failed to start TTS process");
+                    return null;
+                }
+            }
+
+            if (!File.Exists(audioPath))
+            {
+                Console.WriteLine($"[OpenAiSpeechService] Failed to generate audio file at {audioPath}");
+                return null;
+            }
+
+            Console.WriteLine($"[OpenAiSpeechService] Audio file generated successfully");
+
+            await using var audioStream = new FileStream(audioPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            var audioUrl = await _fileStorage.UploadFileAsync(
+                audioStream,
+                audioFileName,
+                "audio/wav",
+                _s3Settings.BucketNameAudio
+            );
+
+            Console.WriteLine($"[OpenAiSpeechService] Audio uploaded to S3: {audioUrl}");
+
+            try { File.Delete(audioPath); }
+            catch { }
+
+            return audioUrl;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[OpenAiSpeechService] Error converting text to speech: {ex.GetType().Name} - {ex.Message}");
+            Console.WriteLine($"[OpenAiSpeechService] Stack trace: {ex.StackTrace}");
+            return null;
+        }
+    }
+
+    private string? GetTTSCommand(out string arguments)
+    {
+        // Check if espeak is available (Linux/Docker)
+        if (CommandExists("espeak"))
+        {
+            arguments = "-w \"{1}\" \"{0}\"";
+            return "espeak";
+        }
+
+        // Fallback to say (macOS)
+        if (CommandExists("say"))
+        {
+            arguments = "-o \"{1}\" -f \"{0}\"";
+            return "say";
+        }
+
+        arguments = string.Empty;
+        return null;
+    }
+
+    private bool CommandExists(string command)
+    {
+        try
+        {
+            var processInfo = new ProcessStartInfo
+            {
+                FileName = "which",
+                Arguments = command,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
+            };
+
+            using (var process = Process.Start(processInfo))
+            {
+                if (process != null)
+                {
+                    process.WaitForExit();
+                    return process.ExitCode == 0;
+                }
+            }
+        }
+        catch
+        {
+        }
+
+        return false;
     }
 }
+

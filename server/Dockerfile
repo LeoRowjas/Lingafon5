@@ -24,6 +24,8 @@ RUN apt-get update && apt-get install -y \
     libgcc-s1 \
     libstdc++6 \
     ffmpeg \
+    espeak \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /app/publish .

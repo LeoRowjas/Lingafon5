@@ -18,10 +18,13 @@ public static class InfrastructureServiceRegistration
 
         if (!File.Exists(modelPath))
         {
-            throw new FileNotFoundException($"Whisper model not found at {modelPath}. Please ensure ggml-tiny.bin is in the application root directory.");
+            Console.WriteLine($"[WARNING] Whisper model not found at {modelPath}. Speech-to-text will not work until the model is added.");
         }
-
-        Console.WriteLine($"Using Whisper model from: {modelPath}");
+        else
+        {
+            Console.WriteLine($"Using Whisper model from: {modelPath}");
+        }
+        
         services.AddSingleton(modelPath);
 
         services.Configure<S3Settings>(configuration.GetSection("S3Settings"));
@@ -30,6 +33,7 @@ public static class InfrastructureServiceRegistration
         services.AddHttpClient<IAiChatService, OllamaChatService>(client =>
         {
             client.BaseAddress = new Uri("http://ollama:11434/");
+            client.Timeout = TimeSpan.FromSeconds(300);
         });
 
         services.AddScoped<IAiSpeechService>(provider =>
