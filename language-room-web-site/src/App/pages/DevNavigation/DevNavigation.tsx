@@ -15,6 +15,11 @@ export function DevNavigation() {
         { path: '/task', name: 'Task Statistics' },
         { path: '/dialog', name: 'Dialog' },
         { path: '/chat/1', name: 'Chat (example id: 1)' },
+        { path: '/live-dialog', name: 'Live Dialog' },
+        { path: '/groups-list', name: 'Groups List' },
+        { path: '/group-details', name: 'Group Details' },
+        { path: '/dialog-report', name: 'Dialog Report' },
+        { path: '/active-sessions', name: 'Active Sessions' },
     ]
 
     return (

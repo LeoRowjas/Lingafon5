@@ -11,26 +11,27 @@
   row-gap: 30px;
 }
 .bg{
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.bgImage{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
 .stepText {
   font-weight: 400;
   font-size: 32px;
   color: #1A202C;
   font-weight: 500;
-}
-.bgImage{
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: -1;
-
 }
 .header {
   display: flex;

@@ -1,0 +1,38 @@
+// ui/DialogCard/DialogCard.module.scss
+.dialogCard {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.dialogTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 12px;
+}
+
+.info {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.role {
+  font-size: 13px;
+  color: #666;
+}
+
+.score {
+  font-size: 13px;
+  color: #4caf50;
+  font-weight: 600;
+}

@@ -1,0 +1,40 @@
+// ui/ActionButton/ActionButton.module.scss
+.actionButton {
+  padding: 14px 32px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: white;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  &.blue {
+    background: #4a90e2;
+
+    &:hover {
+      background: #357abd;
+    }
+  }
+
+  &.green {
+    background: #4caf50;
+
+    &:hover {
+      background: #45a049;
+    }
+  }
+
+  &.red {
+    background: #f44336;
+
+    &:hover {
+      background: #da190b;
+    }
+  }
+}

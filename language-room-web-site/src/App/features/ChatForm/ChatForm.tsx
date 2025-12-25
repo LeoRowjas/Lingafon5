@@ -1,11 +1,11 @@
+import bgImage from "@assets/bgLogin.png"
+import { InfoItem } from '@ui/InfoItem/InfoItem'
+import { ProgressBar } from '@ui/ProgressBar/ProgressBar'
 import styles from './ChatForm.module.scss'
-import bgImage from "@assets/bgLogin.png";
-import {InfoItem} from '@ui/InfoItem/InfoItem'
-import {ProgressBar} from '@ui/ProgressBar/ProgressBar'
 
-import {formatDuration, getStatusText, dialogsMock, messagesMock,recommendationsMock,issuesMock} from './ChatForm.logic.ts'
+import { dialogsMock, formatDuration, getStatusText, issuesMock, messagesMock, recommendationsMock } from './ChatForm.logic.ts'
 
-import type {Dialog} from './ChatForm.logic.ts'
+import type { Dialog } from './ChatForm.logic.ts'
 
 
 
