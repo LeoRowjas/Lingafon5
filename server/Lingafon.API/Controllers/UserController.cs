@@ -19,11 +19,32 @@ public class UserController : ControllerBase
         _storageService = storageService;
     }
     
+    private Guid GetUserIdFromClaims()
+    {
+        var userIdClaim = User.FindFirst("sub")?.Value 
+                          ?? User.FindFirst("nameid")?.Value 
+                          ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+        {
+            throw new UnauthorizedAccessException("User ID not found in claims");
+        }
+        return userId;
+    }
+    
     [HttpGet("")]
     public async Task<IActionResult> GetAll()
     {
         var users = await _service.GetAllAsync();
         return Ok(users);
+    }
+
+    [HttpGet("me")]
+    public async Task<IActionResult> GetMe()
+    {
+        var id = GetUserIdFromClaims();
+        var user = await _service.GetByIdAsync(id);
+        return Ok(user);
     }
     
     [HttpGet("{id}")]
@@ -64,7 +85,7 @@ public class UserController : ControllerBase
     }
 
     [Authorize]
-    [HttpPost("avatar")]
+    [HttpPost("me/avatar")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> UploadAvatar(IFormFile file)
     {
@@ -83,7 +104,7 @@ public class UserController : ControllerBase
     }
 
     [Authorize]
-    [HttpDelete("avatar")]
+    [HttpDelete("me/avatar")]
     public async Task<IActionResult> DeleteAvatar()
     {
         var userId = GetCurrentUserId();

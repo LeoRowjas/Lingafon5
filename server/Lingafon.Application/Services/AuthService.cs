@@ -21,6 +21,13 @@ public class AuthService : IAuthService
 
     public async Task<LoginResponseDto> LoginAsync(LoginRequestDto request)
     {
+        if (request == null)
+            throw new ArgumentNullException(nameof(request));
+        if (string.IsNullOrWhiteSpace(request.Email))
+            throw new ArgumentException("Email cannot be empty", nameof(request.Email));
+        if (string.IsNullOrWhiteSpace(request.Password))
+            throw new ArgumentException("Password cannot be empty", nameof(request.Password));
+
         var user = await _userRepository.GetByEmailAsync(request.Email);
         if (user == null || !_passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password))
         {
@@ -39,6 +46,17 @@ public class AuthService : IAuthService
 
     public async Task<LoginResponseDto> RegisterAsync(RegistrationRequestDto request)
     {
+        if (request == null)
+            throw new ArgumentNullException(nameof(request));
+        if (string.IsNullOrWhiteSpace(request.Email))
+            throw new ArgumentException("Email cannot be empty", nameof(request.Email));
+        if (string.IsNullOrWhiteSpace(request.Password))
+            throw new ArgumentException("Password cannot be empty", nameof(request.Password));
+        if (string.IsNullOrWhiteSpace(request.FirstName))
+            throw new ArgumentException("FirstName cannot be empty", nameof(request.FirstName));
+        if (string.IsNullOrWhiteSpace(request.LastName))
+            throw new ArgumentException("LastName cannot be empty", nameof(request.LastName));
+
         var existingUser = await _userRepository.GetByEmailAsync(request.Email);
         if (existingUser != null)
         {

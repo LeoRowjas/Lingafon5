@@ -2,6 +2,7 @@ using AutoMapper;
 using Lingafon.Application.DTOs.FromEntities;
 using Lingafon.Application.Interfaces.Services;
 using Lingafon.Core.Entities;
+using Lingafon.Core.Enums;
 using Lingafon.Core.Interfaces.Repositories;
 
 namespace Lingafon.Application.Services;
@@ -19,6 +20,9 @@ public class DialogService : IDialogService
 
     public async Task<DialogReadDto?> GetByIdAsync(Guid id)
     {
+        if (id == Guid.Empty)
+            throw new ArgumentException("Id cannot be empty", nameof(id));
+
         var dialog = await _repository.GetByIdAsync(id);
         if (dialog is null)
             return null;
@@ -33,6 +37,9 @@ public class DialogService : IDialogService
 
     public async Task<DialogReadDto> CreateAsync(DialogCreateDto dto)
     {
+        if (dto == null)
+            throw new ArgumentNullException(nameof(dto));
+
         var dialog = _mapper.Map<Dialog>(dto);
         await _repository.AddAsync(dialog);
         return _mapper.Map<DialogReadDto>(dialog);
@@ -40,19 +47,49 @@ public class DialogService : IDialogService
 
     public async Task UpdateAsync(DialogCreateDto dto)
     {
+        if (dto == null)
+            throw new ArgumentNullException(nameof(dto));
+
         var dialog = _mapper.Map<Dialog>(dto);
         await _repository.UpdateAsync(dialog);
     }
 
     public async Task<bool> DeleteAsync(Guid id)
     {
+        if (id == Guid.Empty)
+            throw new ArgumentException("Id cannot be empty", nameof(id));
+
         return await _repository.DeleteAsync(id);
     }
 
     public async Task<IEnumerable<DialogReadDto>> GetForUserAsync(Guid userId)
     {
+        if (userId == Guid.Empty)
+            throw new ArgumentException("UserId cannot be empty", nameof(userId));
+
         var dialogs = await _repository.GetByUserIdAsync(userId);
         return _mapper.Map<IEnumerable<DialogReadDto>>(dialogs);
+    }
+
+    public async Task<DialogReadDto> CreateWithAiAsync(DialogCreateWithAiDto dto, Guid userId)
+    {
+        if (dto == null)
+            throw new ArgumentNullException(nameof(dto));
+        if (userId == Guid.Empty)
+            throw new ArgumentException("UserId cannot be empty", nameof(userId));
+        if (string.IsNullOrWhiteSpace(dto.Title))
+            throw new ArgumentException("Title cannot be empty", nameof(dto.Title));
+
+        var dialog = new Dialog
+        {
+            Title = dto.Title,
+            Type = DialogType.Ai,
+            FirstUserId = userId,
+            SecondUserId = Guid.Empty,
+            CreatedAt = DateTime.UtcNow
+        };
+        await _repository.AddAsync(dialog);
+        return _mapper.Map<DialogReadDto>(dialog);
     }
 }
 

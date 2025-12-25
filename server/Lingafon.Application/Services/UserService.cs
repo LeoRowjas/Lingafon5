@@ -13,16 +13,25 @@ public class UserService : IUserService
     private readonly IFileStorageService _storageService;
     private readonly IUserRepository _repository;
     private readonly IMapper _mapper;
+    private readonly StorageSettings _storageSettings;
 
-    public UserService(IUserRepository repository, IMapper mapper, IFileStorageService storageService)
+    public UserService(
+        IUserRepository repository,
+        IMapper mapper, 
+        IFileStorageService storageService,
+        IOptions<StorageSettings> storageSettings)
     {
         _repository = repository;
         _mapper = mapper;
         _storageService = storageService;
+        _storageSettings = storageSettings.Value;
     }
 
     public async Task<UserReadDto?> GetByIdAsync(Guid id)
     {
+        if (id == Guid.Empty)
+            throw new ArgumentException("Id cannot be empty", nameof(id));
+
         var user = await _repository.GetByIdAsync(id);
         return user is null ? null : _mapper.Map<UserReadDto>(user);
     }
@@ -35,6 +44,9 @@ public class UserService : IUserService
 
     public async Task<UserReadDto> CreateAsync(UserCreateDto dto)
     {
+        if (dto == null)
+            throw new ArgumentNullException(nameof(dto));
+
         var user = _mapper.Map<User>(dto);
         await _repository.AddAsync(user);
         return _mapper.Map<UserReadDto>(user);
@@ -42,17 +54,26 @@ public class UserService : IUserService
 
     public async Task UpdateAsync(UserUpdateDto dto)
     {
+        if (dto == null)
+            throw new ArgumentNullException(nameof(dto));
+
         var user = _mapper.Map<User>(dto);
         await _repository.UpdateAsync(user);
     }
 
     public async Task<bool> DeleteAsync(Guid id)
     {
+        if (id == Guid.Empty)
+            throw new ArgumentException("Id cannot be empty", nameof(id));
+
         return await _repository.DeleteAsync(id);
     }
 
     public async Task<UserReadDto?> GetByEmailAsync(string email)
     {
+        if (string.IsNullOrWhiteSpace(email))
+            throw new ArgumentException("Email cannot be empty", nameof(email));
+
         var user = await _repository.GetByEmailAsync(email);
         if (user is null)
             return null;
@@ -61,25 +82,37 @@ public class UserService : IUserService
 
     public async Task<string?> UpdateAvatarUrlAsync(Guid id, Stream fileStream, string fileName, string contentType)
     {
+        if (id == Guid.Empty)
+            throw new ArgumentException("Id cannot be empty", nameof(id));
+        if (fileStream == null)
+            throw new ArgumentNullException(nameof(fileStream));
+        if (string.IsNullOrWhiteSpace(fileName))
+            throw new ArgumentException("FileName cannot be empty", nameof(fileName));
+        if (string.IsNullOrWhiteSpace(contentType))
+            throw new ArgumentException("ContentType cannot be empty", nameof(contentType));
+
         var user = await _repository.GetByIdAsync(id);
         if (user is null)
             return null;
-        
-        if(!string.IsNullOrEmpty(user.AvatarUrl))
-            await _storageService.DeleteFileAsync(user.AvatarUrl);
 
-        var path = await _storageService.UploadFileAsync(fileStream, fileName, contentType);
+        if (!string.IsNullOrEmpty(user.AvatarUrl))
+            await _storageService.DeleteFileAsync(user.AvatarUrl, _storageSettings.BucketNameAvatars);
+
+        var path = await _storageService.UploadFileAsync(fileStream, fileName, contentType, _storageSettings.BucketNameAvatars);
         await _repository.UpdateAvatarUrlAsync(id, path);
-        
+
         return path;
     }
 
     public async Task<bool> DeleteAvatarAsync(Guid id)
     {
+        if (id == Guid.Empty)
+            throw new ArgumentException("Id cannot be empty", nameof(id));
+
         var user = await _repository.GetByIdAsync(id);
         if (user is null)
             return false;
-        await _storageService.DeleteFileAsync(user.AvatarUrl);
+        await _storageService.DeleteFileAsync(user.AvatarUrl, _storageSettings.BucketNameAvatars);
         return await _repository.DeleteAvatarAsync(id);
     }
 }

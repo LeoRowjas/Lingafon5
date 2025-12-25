@@ -22,9 +22,29 @@ services:
         condition: service_healthy
       minio-init:
         condition: service_completed_successfully
+      ollama:
+        condition: service_started
     networks:
       - lingafon-network
     restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: lingafon-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    networks:
+      - lingafon-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   minio:
     image: minio/minio:latest
@@ -58,7 +78,9 @@ services:
       sleep 5;
       mc alias set myminio http://minio:9000 minioadmin minioadmin;
       mc mb myminio/avatars --ignore-existing;
+      mc mb myminio/audiomessages --ignore-existing;
       mc anonymous set public myminio/avatars;
+      mc anonymous set public myminio/audiomessages;
       echo 'Bucket avatars created successfully';
       exit 0;
       "
@@ -92,4 +114,5 @@ networks:
 volumes:
   postgres_data:
   minio-data:
+  ollama_data:
 

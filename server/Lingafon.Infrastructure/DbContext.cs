@@ -25,4 +25,6 @@ public class LingafonDbContext : DbContext
     public DbSet<AssignmentResult> AssignmentResults { get; set; }
     public DbSet<Dialog> Dialogs { get; set; }
     public DbSet<Message> Messages { get; set; }
+    public DbSet<InviteLink> InviteLinks { get; set; }
+    public DbSet<TeacherStudent>  TeacherStudents { get; set; }
 }
