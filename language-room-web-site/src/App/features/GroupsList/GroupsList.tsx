@@ -1,6 +1,7 @@
 // features/GroupsList/GroupsList.tsx
-import { GroupCard } from '@ui/GroupCard/GroupCard'
+import bgImage from "@assets/bgLogin.png"
 import { BackButton } from '@ui/BackButton/BackButton'
+import { GroupCard } from '@ui/GroupCard/GroupCard'
 import styles from './GroupsList.module.scss'
 
 interface Group {
@@ -17,7 +18,11 @@ const groupsMock: Group[] = [
 
 export function GroupsList() {
   return (
+    <div className={styles.bg}>
+            <img className={styles.bgImage} src={bgImage} alt="background" />
+            
     <div className={styles.container}>
+      <div className={styles.formBlock}>
       <div className={styles.header}>
         <h1 className={styles.title}>Учебные группы</h1>
         <BackButton label="Назад" to="/" />
@@ -33,6 +38,8 @@ export function GroupsList() {
           />
         ))}
       </div>
+    </div>
+    </div>
     </div>
   )
 }

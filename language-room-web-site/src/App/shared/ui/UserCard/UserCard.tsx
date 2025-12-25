@@ -44,7 +44,7 @@ export const UserCard = () => {
             {invitesCount > 0 && (
               <span className={styles.badge}>{displayCount}</span>
             )}
-            <Link to="" className={styles.buttonOrange}>
+            <Link to="/incoming-invitations" className={styles.buttonOrange}>
               Входящие приглашения
             </Link>
           </div>

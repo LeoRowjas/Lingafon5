@@ -1,6 +1,7 @@
 // features/DialogReport/DialogReport.tsx
 import { BackButton } from '@ui/BackButton/BackButton'
 import styles from './DialogReport.module.scss'
+import bgImage from "@assets/bgLogin.png"
 
 interface Correction {
   id: number
@@ -25,6 +26,8 @@ const recommendationsMock: Recommendation[] = [
 export function DialogReport() {
   return (
 
+    <div className={styles.bg}>
+      <img className={styles.bgImage} src={bgImage} alt="background" />
     <div className={styles.container}>
       <div className={styles.formMain}>
       <div className={styles.header}>
@@ -88,6 +91,7 @@ export function DialogReport() {
         </ul>
       </div>
       </div>
+    </div>
     </div>
   )
 }

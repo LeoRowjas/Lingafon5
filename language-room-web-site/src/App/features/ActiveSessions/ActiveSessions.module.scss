@@ -1,6 +1,6 @@
 // features/ActiveSessions/ActiveSessions.module.scss
 .container {
-  max-width: 1200px;
+  width: 1200px;
   margin: 0 auto;
   padding: 40px 20px;
 }
@@ -37,7 +37,7 @@
 
 .sessionsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(700px, 1fr));
   gap: 20px;
 
   @media (max-width: 768px) {

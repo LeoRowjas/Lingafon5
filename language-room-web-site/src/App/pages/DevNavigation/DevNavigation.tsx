@@ -20,6 +20,7 @@ export function DevNavigation() {
         { path: '/group-details', name: 'Group Details' },
         { path: '/dialog-report', name: 'Dialog Report' },
         { path: '/active-sessions', name: 'Active Sessions' },
+        { path: '/incoming-invitations', name: 'IncomingInvitations' },
     ]
 
     return (

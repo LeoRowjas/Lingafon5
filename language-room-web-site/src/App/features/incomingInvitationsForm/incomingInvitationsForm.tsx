@@ -1,5 +1,7 @@
 import bgImage from "@assets/bgLogin.png"
+import { Link } from 'react-router-dom'
 import styles from "./IncomingInvitationsForm.module.scss"
+
 type Invitation = {
   id: number;
   topic: string;
@@ -29,11 +31,8 @@ export function IncomingInvitationsForm() {
     <section className={styles.container}>
 
       <h1 className={styles.title}>Входящие приглашения</h1>
-      <a className={styles.back} href="#">
-        ← Вернуться в личный кабинет
-      </a>
+      <Link className={styles.back} to='/'>← Вернуться в личный кабинет</Link>
 
-      {/* Box */}
       <div className={styles.box}>
         <h2 className={styles.boxTitle}>Новые приглашения</h2>
 

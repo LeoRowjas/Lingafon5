@@ -1,7 +1,8 @@
 // features/GroupDetails/GroupDetails.tsx
-import { useParams } from 'react-router-dom'
-import { StudentCard } from '@ui/StudentCard/StudentCard'
+import bgImage from "@assets/bgLogin.png"
 import { BackButton } from '@ui/BackButton/BackButton'
+import { StudentCard } from '@ui/StudentCard/StudentCard'
+import { useParams } from 'react-router-dom'
 import styles from './GroupDetails.module.scss'
 
 interface Student {
@@ -19,6 +20,9 @@ export function GroupDetails() {
   const { groupId } = useParams<{ groupId: string }>()
 
   return (
+    <div className={styles.bg}>
+      <img className={styles.bgImage} src={bgImage} alt="background" />
+      <div className={styles.formBlock}>
     <div className={styles.container}>
       <div className={styles.header}>
         <h1 className={styles.title}>Учебная группа ГР-2024-01</h1>
@@ -36,6 +40,8 @@ export function GroupDetails() {
           />
         ))}
       </div>
+    </div>
+    </div>
     </div>
   )
 }
