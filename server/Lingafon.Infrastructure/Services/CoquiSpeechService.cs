@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text;
 using Lingafon.Core.Interfaces.Services;
 using Lingafon.Infrastructure.Settings;
@@ -14,6 +16,8 @@ public class OpenAiSpeechService : IAiSpeechService
     private readonly S3Settings _s3Settings;
     private readonly string _modelPath;
 
+    private readonly string? _openTtsUrl;
+
     public OpenAiSpeechService(
         IFileStorageService fileStorage,
         IOptions<S3Settings> s3Settings,
@@ -22,6 +26,7 @@ public class OpenAiSpeechService : IAiSpeechService
         _fileStorage = fileStorage;
         _s3Settings = s3Settings.Value;
         _modelPath = modelPath;
+        _openTtsUrl = Environment.GetEnvironmentVariable("OPEN_TTS_URL");
     }
 
     public async Task<string?> GetTextFromSpeechAsync(string audioPath)
@@ -85,54 +90,93 @@ public class OpenAiSpeechService : IAiSpeechService
             var audioFileName = $"ai_reply_{Guid.NewGuid()}.wav";
             var audioPath = Path.Combine(Path.GetTempPath(), audioFileName);
 
-            // Try espeak for Linux (Docker), fallback to say for macOS
-            var ttsCommand = GetTTSCommand(out var arguments);
-            
-            if (string.IsNullOrEmpty(ttsCommand))
+            // If OPEN_TTS_URL configured, prefer remote OpenTTS service
+            if (!string.IsNullOrEmpty(_openTtsUrl))
             {
-                Console.WriteLine($"[OpenAiSpeechService] No TTS command available (espeak or say not found)");
-                return null;
+                try
+                {
+                    Console.WriteLine($"[OpenAiSpeechService] Using OpenTTS at {_openTtsUrl}");
+                    using var http = new HttpClient { BaseAddress = new Uri(_openTtsUrl) };
+
+                    var payload = new
+                    {
+                        text = text,
+                        voice = "alloy",
+                        format = "wav"
+                    };
+
+                    var resp = await http.PostAsJsonAsync("api/tts", payload);
+                    if (!resp.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine($"[OpenAiSpeechService] OpenTTS returned {(int)resp.StatusCode} - {resp.ReasonPhrase}");
+                    }
+                    else
+                    {
+                        var bytes = await resp.Content.ReadAsByteArrayAsync();
+                        await File.WriteAllBytesAsync(audioPath, bytes);
+                        Console.WriteLine($"[OpenAiSpeechService] Received wav from OpenTTS, saved to {audioPath}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[OpenAiSpeechService] OpenTTS call failed: {ex.Message}");
+                }
             }
 
-            var process = new ProcessStartInfo
+            // If file not created by OpenTTS, fallback to local TTS commands
+            if (!File.Exists(audioPath))
             {
-                FileName = ttsCommand,
-                Arguments = string.Format(arguments, text, audioPath),
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true
-            };
+                Console.WriteLine("[OpenAiSpeechService] Falling back to local TTS command");
 
-            Console.WriteLine($"[OpenAiSpeechService] Executing: {ttsCommand} {process.Arguments}");
+                // Try espeak for Linux (Docker), fallback to say for macOS
+                var ttsCommand = GetTTSCommand(out var arguments);
 
-            using (var proc = Process.Start(process))
-            {
-                if (proc != null)
+                if (string.IsNullOrEmpty(ttsCommand))
                 {
-                    await proc.WaitForExitAsync();
-                    var error = await proc.StandardError.ReadToEndAsync();
-                    
-                    if (proc.ExitCode != 0)
+                    Console.WriteLine($"[OpenAiSpeechService] No TTS command available (espeak or say not found)");
+                    return null;
+                }
+
+                var process = new ProcessStartInfo
+                {
+                    FileName = ttsCommand,
+                    Arguments = string.Format(arguments, text, audioPath),
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                };
+
+                Console.WriteLine($"[OpenAiSpeechService] Executing: {ttsCommand} {process.Arguments}");
+
+                using (var proc = Process.Start(process))
+                {
+                    if (proc != null)
                     {
-                        Console.WriteLine($"[OpenAiSpeechService] TTS command error (exit code {proc.ExitCode}): {error}");
+                        await proc.WaitForExitAsync();
+                        var error = await proc.StandardError.ReadToEndAsync();
+
+                        if (proc.ExitCode != 0)
+                        {
+                            Console.WriteLine($"[OpenAiSpeechService] TTS command error (exit code {proc.ExitCode}): {error}");
+                            return null;
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[OpenAiSpeechService] Failed to start TTS process");
                         return null;
                     }
                 }
-                else
+
+                if (!File.Exists(audioPath))
                 {
-                    Console.WriteLine($"[OpenAiSpeechService] Failed to start TTS process");
+                    Console.WriteLine($"[OpenAiSpeechService] Failed to generate audio file at {audioPath}");
                     return null;
                 }
-            }
 
-            if (!File.Exists(audioPath))
-            {
-                Console.WriteLine($"[OpenAiSpeechService] Failed to generate audio file at {audioPath}");
-                return null;
+                Console.WriteLine($"[OpenAiSpeechService] Audio file generated successfully");
             }
-
-            Console.WriteLine($"[OpenAiSpeechService] Audio file generated successfully");
 
             await using var audioStream = new FileStream(audioPath, FileMode.Open, FileAccess.Read, FileShare.Read);
             var audioUrl = await _fileStorage.UploadFileAsync(
@@ -207,4 +251,3 @@ public class OpenAiSpeechService : IAiSpeechService
         return false;
     }
 }
-
