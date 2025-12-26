@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Lingafon.Core.Enums;
 
 namespace Lingafon.Core.Entities;
@@ -25,4 +26,8 @@ public class User : BaseEntity
     
     public string AvatarUrl { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
+    
+    public DateTime LastSeenAt { get; set; }
+    [NotMapped]
+    public bool IsOnline { get; set; }
 }

@@ -135,6 +135,13 @@ public class UserController : ControllerBase
         return Ok(isDeleted);
     }
     
+    [HttpGet("{id}/status")]
+    public async Task<IActionResult> GetStatus(Guid id)
+    {
+        var status = await _service.GetStatusAsync(id);
+        return Ok(status);
+    }
+    
     private Guid GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -145,4 +152,3 @@ public class UserController : ControllerBase
         return userId;
     }
 }
-

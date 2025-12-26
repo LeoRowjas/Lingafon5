@@ -52,12 +52,14 @@ public static class InfrastructureServiceRegistration
         services.AddScoped<IInviteLinkRepository, InviteLinkRepository>();
         services.AddScoped<ITeacherStudentRepository, TeacherStudentRepository>();
 
+        services.AddSingleton<IOnlineStatusService, ConnectionManager>();
+
         services.AddScoped<IFileStorageService, S3FileStorageService>();
         
         services.AddScoped<PasswordHasher<User>>();
         services.AddScoped<IPasswordHasher, PasswordHashService>();
         services.AddScoped<IJwtTokenService, JwtTokenService>();
-
+        
         return services;
     }
 }

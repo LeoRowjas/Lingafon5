@@ -20,3 +20,9 @@ public record UserUpdateDto
     public string? AvatarUrl { get; init; }
 }
 
+public record UserStatusDto
+{
+    public bool IsOnline { get; set; }
+    public DateTime? LastSeenAt { get; set; }
+}
+

@@ -1,5 +1,6 @@
 using System.Text;
 using Lingafon.Api.Middleware;
+using Lingafon.API.WebSockets;
 using Lingafon.Application;
 using Lingafon.Application.DTOs.FromEntities;
 using Lingafon.Infrastructure;
@@ -86,6 +87,7 @@ public class Program
         
         builder.Services.AddApplicationServices(builder.Configuration); //Register Application layer services
         builder.Services.AddInfrastructureServices(builder.Configuration); //Register Infrastructure layer services
+        builder.Services.AddScoped<WebSocketHandler>(); //Register service from API layer
 
         var app = builder.Build();
         
@@ -106,11 +108,28 @@ public class Program
         app.UseCors("AllowFrontend");
         
         app.UseHttpsRedirection();
+
+        app.MapControllers();
+        
+        app.UseWebSockets();
+        // WebSocket endpoint
+        app.Map("/ws", async context =>
+        {
+            if (context.WebSockets.IsWebSocketRequest)
+            {
+                using var scope = context.RequestServices.CreateScope();
+                var webSocketHandler = scope.ServiceProvider.GetRequiredService<WebSocketHandler>();
+                var socket = await context.WebSockets.AcceptWebSocketAsync();
+                await webSocketHandler.HandleAsync(context, socket);
+            }
+            else
+            {
+                context.Response.StatusCode = 400;
+            }
+        });
         
         app.UseAuthentication();
         app.UseAuthorization();
-
-        app.MapControllers();
         
         app.Run();
     }

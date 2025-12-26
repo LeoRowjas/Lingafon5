@@ -13,17 +13,20 @@ public class UserService : IUserService
     private readonly IFileStorageService _storageService;
     private readonly IUserRepository _repository;
     private readonly IMapper _mapper;
+    private readonly IOnlineStatusService _statusService;
     private readonly StorageSettings _storageSettings;
 
     public UserService(
         IUserRepository repository,
         IMapper mapper, 
         IFileStorageService storageService,
-        IOptions<StorageSettings> storageSettings)
+        IOptions<StorageSettings> storageSettings, 
+        IOnlineStatusService statusService)
     {
         _repository = repository;
         _mapper = mapper;
         _storageService = storageService;
+        _statusService = statusService;
         _storageSettings = storageSettings.Value;
     }
 
@@ -40,6 +43,18 @@ public class UserService : IUserService
     {
         var users = await _repository.GetAllAsync();
         return _mapper.Map<IEnumerable<UserReadDto>>(users);
+    }
+    
+    public async Task<UserStatusDto?> GetStatusAsync(Guid userId)
+    {
+        var user = await _repository.GetByIdAsync(userId);
+        var isOnline = _statusService.IsOnline(userId);
+        
+        return new UserStatusDto
+        {
+            IsOnline = isOnline,
+            LastSeenAt = isOnline ? null : user.LastSeenAt,
+        };
     }
 
     public async Task<UserReadDto> CreateAsync(UserCreateDto dto)
@@ -116,4 +131,3 @@ public class UserService : IUserService
         return await _repository.DeleteAvatarAsync(id);
     }
 }
-

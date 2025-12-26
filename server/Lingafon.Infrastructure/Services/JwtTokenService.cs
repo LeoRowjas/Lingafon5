@@ -45,4 +45,14 @@ public class JwtTokenService : IJwtTokenService
         
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    public Guid GetUserId(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadJwtToken(token);
+        var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "sub" || c.Type == ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+            throw new Exception("User ID claim not found in token");
+        return Guid.Parse(userIdClaim.Value);
+    }
 }

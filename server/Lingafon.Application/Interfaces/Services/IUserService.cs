@@ -7,4 +7,5 @@ public interface IUserService : IService<UserReadDto, UserCreateDto, UserUpdateD
     Task<UserReadDto?> GetByEmailAsync(string email);
     Task<string?> UpdateAvatarUrlAsync(Guid id, Stream fileStream, string fileName, string contentType);
     Task<bool> DeleteAvatarAsync(Guid id);
+    Task<UserStatusDto?> GetStatusAsync(Guid userId);
 }

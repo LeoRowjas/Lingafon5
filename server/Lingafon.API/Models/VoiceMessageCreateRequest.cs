@@ -1,6 +1,3 @@
-using System;
-using Microsoft.AspNetCore.Http;
-
 namespace Lingafon.API.Models
 {
     public class VoiceMessageCreateRequest
