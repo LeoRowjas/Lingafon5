@@ -46,4 +46,11 @@ public class InviteController : ControllerBase
         var acceptance = await _inviteService.AcceptInviteLink(userId, token);
         return Ok(acceptance);
     }
+
+    [HttpGet("")]
+    public async Task<IActionResult> GetAllInviteLink()
+    {
+        var invites = await _inviteService.GetAllAsync();
+        return Ok(invites);
+    }
 }

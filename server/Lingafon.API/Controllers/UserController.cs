@@ -4,6 +4,7 @@ using Lingafon.Core.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Lingafon.Core.Interfaces.Repositories;
 
 namespace Lingafon.API.Controllers;
 
@@ -13,10 +14,12 @@ public class UserController : ControllerBase
 {
     private readonly IUserService _service;
     private readonly IFileStorageService _storageService;
-    public UserController(IUserService service, IFileStorageService storageService)
+    private readonly ITeacherStudentRepository _teacherStudentRepository;
+    public UserController(IUserService service, IFileStorageService storageService, ITeacherStudentRepository teacherStudentRepository)
     {
         _service = service;
         _storageService = storageService;
+        _teacherStudentRepository = teacherStudentRepository;
     }
     
     private Guid GetUserIdFromClaims()
@@ -59,6 +62,26 @@ public class UserController : ControllerBase
     {
         var user = await _service.GetByEmailAsync(email);
         return Ok(user);
+    }
+    
+    [Authorize]
+    [HttpGet("me/students")]
+    public async Task<IActionResult> GetStudents()
+    {
+        var userId = GetUserIdFromClaims();
+        var students = await _teacherStudentRepository.GetAllFotTeacherAsync(userId);
+        
+        return Ok(students);
+    }
+
+    [Authorize]
+    [HttpGet("me/teachers")]
+    public async Task<IActionResult> GetTeachers()
+    {
+        var userId = GetUserIdFromClaims();
+        var teachers = await _teacherStudentRepository.GetAllFotStudentAsync(userId);
+        
+        return Ok(teachers);
     }
     
     [HttpPost("")]

@@ -62,4 +62,17 @@ public class TeacherStudentRepository : ITeacherStudentRepository
         
         return all;
     }
+
+    public async Task<IEnumerable<TeacherStudent>?> GetAllFotStudentAsync(Guid studentId)
+    {
+        var student = await _dbContext.InviteLinks.FindAsync(studentId);
+        if (student is null)
+            return null;
+
+        var all = await _dbContext.TeacherStudents
+            .Where(x => x.StudentId == studentId)
+            .ToListAsync();
+
+        return all;
+    }
 }
