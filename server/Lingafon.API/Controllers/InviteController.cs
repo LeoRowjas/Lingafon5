@@ -53,4 +53,12 @@ public class InviteController : ControllerBase
         var invites = await _inviteService.GetAllAsync();
         return Ok(invites);
     }
+
+    [Authorize]
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteInviteLink(Guid id)
+    {
+        var invite = await _inviteService.DeleteAsync(id);
+        return Ok(invite);
+    }
 }
