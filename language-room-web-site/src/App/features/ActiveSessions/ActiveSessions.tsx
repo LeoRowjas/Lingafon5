@@ -45,7 +45,7 @@ export function ActiveSessions() {
       <div className={styles.formBlock}>
       <div className={styles.header}>
         <h1 className={styles.title}>Активные парные сессии</h1>
-        <BackButton label="Назад" to="/" />
+        <BackButton label="Назад" to="/profile-teacher" />
       </div>
 
       <div className={styles.sessionsGrid}>
