@@ -27,6 +27,7 @@ export function WebLoginForm() {
             const data = await login({email, password});
 
             localStorage.setItem("token", data.token);
+            localStorage.setItem("userId", data.userId);
 
             navigate("/profile");
         } catch (e: any){

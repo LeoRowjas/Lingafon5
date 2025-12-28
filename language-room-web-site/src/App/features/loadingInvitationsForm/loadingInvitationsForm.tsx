@@ -3,20 +3,36 @@ import bgImage from "@assets/bgLogin.png";
 import { useStudentChoice } from "@entities/ChatSelectionContext";
 import clockImg from '@assets/clok.png'
 import { sendChatInvite } from "@shared/mock/chatEvents.mock";
-import {Link} from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
+import { getInvites } from "@entities/invite/api/inviteApi";
+import { useEffect } from "react";
 
 export function LoadingInvitationsForm () {
 
     const { choice } = useStudentChoice();
+    const navigate = useNavigate();
 
-    const handleInvite = () => {
-        sendChatInvite({
-            from: "studentA",
-            to: choice.student?.id,
-            theme: choice.theme,
-            role: choice.role,
-    });
-    };
+    useEffect(() => {
+        if (!choice.student?.inviteToken) return;
+
+        const interval = setInterval(async () => {
+            try {
+                const invites = await getInvites();
+
+                const myInvite = invites.find(
+                    (inv: any) => inv.token === choice.student?.inviteToken
+                );
+
+                if (myInvite && myInvite.isUsed === true) {
+                clearInterval(interval);
+                navigate("/dialog");
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }, 3000);
+        return () => clearInterval(interval);
+    }, [choice.student, navigate]);
 
     return(
         <div className={styles.bg}>
@@ -63,7 +79,7 @@ export function LoadingInvitationsForm () {
                     <div className={styles.mainShow}>
                         <img className={styles.clockImg} src={clockImg} alt="" />
                         <p className={styles.subtitleMain}>
-                            Выберите студента для приглашения
+                            Ожидание принятия приглашения
                         </p>
 
                         <div className={styles.summary}>
@@ -85,7 +101,7 @@ export function LoadingInvitationsForm () {
 
                         </div>
                         <p>Ожидаем ответа от студента...</p>
-                        <button className={styles.buttonRed}><Link to='/dialog'>Отмена</Link></button>
+                        <button className={styles.buttonRed}><Link to='/profile'>Отмена</Link></button>
                         
                     </div>
                 </section>
