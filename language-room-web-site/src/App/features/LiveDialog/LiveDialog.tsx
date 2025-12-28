@@ -3,6 +3,7 @@ import bgImage from "@assets/bgLogin.png"
 import { ActionButton } from '@ui/ActionButton/ActionButton'
 import { BackButton } from '@ui/BackButton/BackButton'
 import styles from './LiveDialog.module.scss'
+import { Link } from "react-router-dom"
 
 interface Message {
   id: number
@@ -56,7 +57,9 @@ export function LiveDialog() {
 
         <div className={styles.actions}>
           <ActionButton variant="red">
-            Завершить сессию
+            <Link to="/profile-teacher">
+              Завершить сессию
+            </Link>
           </ActionButton>
         </div>
       </div>

@@ -34,7 +34,7 @@ export function ActiveSessions() {
   const navigate = useNavigate()
 
   const handleSessionClick = (sessionId: string) => {
-    navigate(`/live-dialog/${sessionId}`)
+    navigate(`/live-dialog`)
   }
 
   return (

@@ -1,5 +1,6 @@
 // features/StudentProfile/StudentProfile.tsx
-import { useParams } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
 import { DialogCard } from '@ui/DialogCard/DialogCard'
 import { BackButton } from '@ui/BackButton/BackButton'
 import styles from './StudentProfile.module.scss'
@@ -23,7 +24,7 @@ export function StudentProfile() {
     <div className={styles.container}>
       <div className={styles.header}>
         <h1 className={styles.title}>Профиль ученика</h1>
-        <BackButton label="Назад к группе" to={`/groups/${groupId}`} />
+        <BackButton label="Назад к группе" to={`/group-details`} />
       </div>
 
       <div className={styles.infoCard}>
@@ -48,6 +49,7 @@ export function StudentProfile() {
         <h2 className={styles.sectionTitle}>Пройденные диалоги</h2>
         <div className={styles.dialogsGrid}>
           {dialogsMock.map((dialog) => (
+            <Link to="/dialog-report">
             <DialogCard
               key={dialog.id}
               id={dialog.id}
@@ -55,6 +57,7 @@ export function StudentProfile() {
               role={dialog.role}
               score={dialog.score}
             />
+            </Link>
           ))}
         </div>
       </div>

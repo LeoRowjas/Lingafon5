@@ -12,7 +12,7 @@ import { DialogReportPage } from '@pages/DialogReportPage/DialogReportPage'
 import { GroupDetailsPage } from '@pages/GroupDetailsPage/GroupDetailsPage'
 import { GroupsListPage } from '@pages/GroupsListPage/GroupsListPage'
 import { LiveDialogPage } from '@pages/LiveDialogPage/LiveDialogPage'
-import { IncomingInvitations } from '@pages/incomingInvitations/incomingInvitations'
+import { IncomingInvitations } from '@pages/incomingInvitations/IncomingInvitations'
 
 import { Login } from '@pages/Login/Login'
 
@@ -22,7 +22,8 @@ import { SelectRole } from '@pages/SelectRole/SelectRole'
 import { StudentChoice } from '@pages/StudentChoice/StudentChoice'
 import { TaskStatistics } from '@pages/TaskStatistics/TaskStatistics'
 import { LoadingInvitations } from '@pages/loadingInvitations/loadingInvitations'
-
+import { ProfileTeacher } from '@pages/ProfileTeacher/ProfileTeacher'
+import { Student_profile } from '@pages/StudentProfile/StudentProfile'
 
 import { Header } from '@ui/Header/Header'
 
@@ -53,6 +54,8 @@ export function App() {
       <Route path="/dialog-report" element={<DialogReportPage />} />
       <Route path="/active-sessions" element={<ActiveSessionsPage />} />
       <Route path="/incoming-invitations" element={<IncomingInvitations />} />
+      <Route path="/profile-teacher" element={<ProfileTeacher />} />
+      <Route path="/student-profile" element={<Student_profile />} />
     </Routes>
     </>
   )

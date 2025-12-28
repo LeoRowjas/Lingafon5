@@ -32,7 +32,7 @@ export function GroupsList() {
   const [studentsCount, setStudentsCount] = useState('')
 
   const handleGroupClick = (groupId: string) => {
-    navigate(`/groups/${groupId}`)
+    navigate(`/group-details`)
   }
 
   const handleEdit = (group: Group, e: React.MouseEvent) => {

@@ -5,7 +5,7 @@ import { BackButton } from '@ui/BackButton/BackButton'
 import { Input } from '@ui/Input/Input'
 import { Modal } from '@ui/Modal/Modal'
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import styles from './GroupDetails.module.scss'
 
 interface Student {
@@ -80,6 +80,7 @@ export function GroupDetails() {
 
       <div className={styles.studentsGrid}>
         {studentsMock.map((student) => (
+          <Link to="/student-profile">
           <div key={student.id} className={styles.studentCard}>
             <div className={styles.studentInfo}>
               <h3 className={styles.studentName}>{student.name}</h3>
@@ -100,6 +101,7 @@ export function GroupDetails() {
               </button>
             </div>
           </div>
+          </Link>
         ))}
       </div>
 
