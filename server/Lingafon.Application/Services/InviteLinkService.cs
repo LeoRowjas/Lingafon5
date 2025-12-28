@@ -67,7 +67,9 @@ public class InviteLinkService : IInviteLinkService
         if (id == Guid.Empty)
             throw new ArgumentException("Id cannot be empty", nameof(id));
 
-        return await _inviteLinkRepository.DeleteAsync(id);
+        var invite = await _inviteLinkRepository.GetByTokenAsync(id.ToString());
+
+        return await _inviteLinkRepository.DeleteAsync(invite!.Id);
     }
 
     public async Task<bool> AcceptInviteLink(Guid userId, string token)
