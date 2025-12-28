@@ -1,57 +1,62 @@
-using System.Diagnostics;
+using System;
+using System.IO;
 using System.Net.Http;
-using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
 using Lingafon.Core.Interfaces.Services;
 using Lingafon.Infrastructure.Settings;
 using Microsoft.Extensions.Options;
 using Whisper.net;
 
-
 namespace Lingafon.Infrastructure.Services;
 
-public class OpenAiSpeechService : IAiSpeechService
+public class CoquiSpeechService : IAiSpeechService
 {
     private readonly IFileStorageService _fileStorage;
     private readonly S3Settings _s3Settings;
-    private readonly string _modelPath;
+    private readonly string _whisperModelPath;
+    private readonly HttpClient _httpClient;
+    private readonly string _kokoroTtsUrl;
 
-    private readonly string? _openTtsUrl;
-
-    public OpenAiSpeechService(
+    public CoquiSpeechService(
         IFileStorageService fileStorage,
         IOptions<S3Settings> s3Settings,
-        string modelPath)
+        string modelPath,
+        HttpClient httpClient)
     {
         _fileStorage = fileStorage;
         _s3Settings = s3Settings.Value;
-        _modelPath = modelPath;
-        _openTtsUrl = Environment.GetEnvironmentVariable("OPEN_TTS_URL");
+        _whisperModelPath = modelPath;
+        _httpClient = httpClient;
+        _kokoroTtsUrl = Environment.GetEnvironmentVariable("KOKORO_TTS_URL") ?? "http://localhost:8080";
     }
 
     public async Task<string?> GetTextFromSpeechAsync(string audioPath)
     {
         try
         {
-            Console.WriteLine($"[OpenAiSpeechService] Processing audio file: {audioPath}");
+            Console.WriteLine($"[CoquiSpeechService] Processing audio file: {audioPath}");
 
-            if (string.IsNullOrEmpty(_modelPath) || !File.Exists(_modelPath))
+            if (string.IsNullOrEmpty(_whisperModelPath) || !File.Exists(_whisperModelPath))
             {
-                Console.WriteLine($"[OpenAiSpeechService] Whisper model not available at {_modelPath}");
+                Console.WriteLine($"[CoquiSpeechService] Whisper model not available at {_whisperModelPath}");
                 return null;
             }
 
             if (!AudioConversionHelper.IsSupportedAudioFormat(audioPath))
             {
-                Console.WriteLine($"[OpenAiSpeechService] Unsupported audio format: {AudioConversionHelper.GetAudioFormatName(audioPath)}");
+                Console.WriteLine($"[CoquiSpeechService] Unsupported audio format: {AudioConversionHelper.GetAudioFormatName(audioPath)}");
                 return null;
             }
 
             var processedAudioPath = AudioConversionHelper.ConvertToWhisperFormat(audioPath);
-            Console.WriteLine($"[OpenAiSpeechService] Converted audio to: {processedAudioPath}");
+            Console.WriteLine($"[CoquiSpeechService] Converted audio to: {processedAudioPath}");
 
-            using var factory = WhisperFactory.FromPath(_modelPath);
-            await using var processor = factory.CreateBuilder().WithLanguage("auto").Build();
+            using var factory = WhisperFactory.FromPath(_whisperModelPath);
+            using var processor = factory.CreateBuilder()
+                .WithLanguage("en")
+                .Build();
 
             await using var audioStream = File.OpenRead(processedAudioPath);
             var sb = new StringBuilder();
@@ -61,19 +66,19 @@ public class OpenAiSpeechService : IAiSpeechService
             }
 
             var transcription = sb.ToString();
-            Console.WriteLine($"[OpenAiSpeechService] Transcription result: {transcription}");
+            Console.WriteLine($"[CoquiSpeechService] Transcription result: {transcription}");
 
-            if (processedAudioPath != audioPath && File.Exists(processedAudioPath))
+            try { File.Delete(processedAudioPath); }
+            catch (Exception ex)
             {
-                try { File.Delete(processedAudioPath); }
-                catch { }
+                Console.WriteLine($"[CoquiSpeechService] Failed to delete processed audio temp file: {ex.GetType().Name} - {ex.Message}");
             }
 
             return transcription;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[OpenAiSpeechService] Error during transcription: {ex.GetType().Name} - {ex.Message}");
+            Console.WriteLine($"[CoquiSpeechService] Error during transcription: {ex.GetType().Name} - {ex.Message}");
             return null;
         }
     }
@@ -83,171 +88,84 @@ public class OpenAiSpeechService : IAiSpeechService
         try
         {
             if (string.IsNullOrWhiteSpace(text))
-                return null;
-
-            Console.WriteLine($"[OpenAiSpeechService] Converting text to speech: {text.Substring(0, Math.Min(50, text.Length))}...");
-
-            var audioFileName = $"ai_reply_{Guid.NewGuid()}.wav";
-            var audioPath = Path.Combine(Path.GetTempPath(), audioFileName);
-
-            // If OPEN_TTS_URL configured, prefer remote OpenTTS service
-            if (!string.IsNullOrEmpty(_openTtsUrl))
             {
-                try
-                {
-                    Console.WriteLine($"[OpenAiSpeechService] Using OpenTTS at {_openTtsUrl}");
-                    using var http = new HttpClient { BaseAddress = new Uri(_openTtsUrl) };
+                return null;
+            }
 
-                    var payload = new
-                    {
-                        text = text,
-                        voice = "alloy",
-                        format = "wav"
-                    };
+            Console.WriteLine($"[CoquiSpeechService] Starting TTS for text: {text}");
+            Console.WriteLine($"[CoquiSpeechService] Using Kokoro TTS service at: {_kokoroTtsUrl}");
 
-                    var resp = await http.PostAsJsonAsync("api/tts", payload);
-                    if (!resp.IsSuccessStatusCode)
-                    {
-                        Console.WriteLine($"[OpenAiSpeechService] OpenTTS returned {(int)resp.StatusCode} - {resp.ReasonPhrase}");
-                    }
-                    else
-                    {
-                        var bytes = await resp.Content.ReadAsByteArrayAsync();
-                        await File.WriteAllBytesAsync(audioPath, bytes);
-                        Console.WriteLine($"[OpenAiSpeechService] Received wav from OpenTTS, saved to {audioPath}");
-                    }
-                }
+            // Use default voice (af_bella as per Kokoro TTS readme)
+            var voice = "af_bella";
+            Console.WriteLine($"[CoquiSpeechService] Using voice: {voice}");
+
+            // Create JSON payload for Kokoro TTS API
+            var requestBody = new { text = text, voice = voice };
+            var jsonContent = JsonSerializer.Serialize(requestBody);
+            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            Console.WriteLine($"[CoquiSpeechService] Calling Kokoro TTS API POST /tts with JSON...");
+
+            var response = await _httpClient.PostAsync($"{_kokoroTtsUrl}/tts", content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"[CoquiSpeechService] Kokoro TTS API returned error: {response.StatusCode} - {response.ReasonPhrase}");
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"[CoquiSpeechService] Error response: {errorContent}");
+                return null;
+            }
+
+            var audioBytes = await response.Content.ReadAsByteArrayAsync();
+            Console.WriteLine($"[CoquiSpeechService] Synthesized {audioBytes.Length} bytes");
+
+            // Save audio to temporary file
+            var filePath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.wav");
+            try
+            {
+                await File.WriteAllBytesAsync(filePath, audioBytes);
+                Console.WriteLine($"[CoquiSpeechService] Synthesis saved to: {filePath}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[CoquiSpeechService] Failed to save audio file: {ex.GetType().Name} - {ex.Message}");
+                return null;
+            }
+
+            // Upload to storage
+            try
+            {
+                await using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                var fileName = Path.GetFileName(filePath);
+                Console.WriteLine($"[CoquiSpeechService] Uploading synthesized file {fileName} to bucket {_s3Settings.BucketNameAudio}");
+                var uploadedUrl = await _fileStorage.UploadFileAsync(fs, fileName, "audio/wav", _s3Settings.BucketNameAudio);
+                Console.WriteLine($"[CoquiSpeechService] Uploaded synthesized audio to: {uploadedUrl}");
+
+                try { File.Delete(filePath); }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"[OpenAiSpeechService] OpenTTS call failed: {ex.Message}");
+                    Console.WriteLine($"[CoquiSpeechService] Failed to delete temp file after upload: {ex.GetType().Name} - {ex.Message}");
                 }
-            }
 
-            // If file not created by OpenTTS, fallback to local TTS commands
-            if (!File.Exists(audioPath))
+                return uploadedUrl;
+            }
+            catch (Exception ex)
             {
-                Console.WriteLine("[OpenAiSpeechService] Falling back to local TTS command");
-
-                // Try espeak for Linux (Docker), fallback to say for macOS
-                var ttsCommand = GetTTSCommand(out var arguments);
-
-                if (string.IsNullOrEmpty(ttsCommand))
+                Console.WriteLine($"[CoquiSpeechService] Failed to upload synthesized audio: {ex.GetType().Name} - {ex.Message}");
+                try { File.Delete(filePath); }
+                catch (Exception dex)
                 {
-                    Console.WriteLine($"[OpenAiSpeechService] No TTS command available (espeak or say not found)");
-                    return null;
+                    Console.WriteLine($"[CoquiSpeechService] Failed to delete temp file after upload failure: {dex.GetType().Name} - {dex.Message}");
                 }
-
-                var process = new ProcessStartInfo
-                {
-                    FileName = ttsCommand,
-                    Arguments = string.Format(arguments, text, audioPath),
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    CreateNoWindow = true
-                };
-
-                Console.WriteLine($"[OpenAiSpeechService] Executing: {ttsCommand} {process.Arguments}");
-
-                using (var proc = Process.Start(process))
-                {
-                    if (proc != null)
-                    {
-                        await proc.WaitForExitAsync();
-                        var error = await proc.StandardError.ReadToEndAsync();
-
-                        if (proc.ExitCode != 0)
-                        {
-                            Console.WriteLine($"[OpenAiSpeechService] TTS command error (exit code {proc.ExitCode}): {error}");
-                            return null;
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine($"[OpenAiSpeechService] Failed to start TTS process");
-                        return null;
-                    }
-                }
-
-                if (!File.Exists(audioPath))
-                {
-                    Console.WriteLine($"[OpenAiSpeechService] Failed to generate audio file at {audioPath}");
-                    return null;
-                }
-
-                Console.WriteLine($"[OpenAiSpeechService] Audio file generated successfully");
+                return null;
             }
-
-            await using var audioStream = new FileStream(audioPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            var audioUrl = await _fileStorage.UploadFileAsync(
-                audioStream,
-                audioFileName,
-                "audio/wav",
-                _s3Settings.BucketNameAudio
-            );
-
-            Console.WriteLine($"[OpenAiSpeechService] Audio uploaded to S3: {audioUrl}");
-
-            try { File.Delete(audioPath); }
-            catch { }
-
-            return audioUrl;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[OpenAiSpeechService] Error converting text to speech: {ex.GetType().Name} - {ex.Message}");
-            Console.WriteLine($"[OpenAiSpeechService] Stack trace: {ex.StackTrace}");
+            Console.WriteLine($"[CoquiSpeechService] Error during TTS: {ex.GetType().Name} - {ex.Message}");
+            Console.WriteLine(ex.StackTrace);
             return null;
         }
     }
-
-    private string? GetTTSCommand(out string arguments)
-    {
-        // Check if espeak is available (Linux/Docker)
-        if (CommandExists("espeak"))
-        {
-            arguments = "-w \"{1}\" \"{0}\"";
-            return "espeak";
-        }
-
-        // Fallback to say (macOS)
-        if (CommandExists("say"))
-        {
-            arguments = "-o \"{1}\" -f \"{0}\"";
-            return "say";
-        }
-
-        arguments = string.Empty;
-        return null;
-    }
-
-    private bool CommandExists(string command)
-    {
-        try
-        {
-            var processInfo = new ProcessStartInfo
-            {
-                FileName = "which",
-                Arguments = command,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true
-            };
-
-            using (var process = Process.Start(processInfo))
-            {
-                if (process != null)
-                {
-                    process.WaitForExit();
-                    return process.ExitCode == 0;
-                }
-            }
-        }
-        catch
-        {
-        }
-
-        return false;
-    }
 }
+

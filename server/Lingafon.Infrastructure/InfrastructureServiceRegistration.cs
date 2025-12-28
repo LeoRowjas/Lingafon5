@@ -28,7 +28,7 @@ public static class InfrastructureServiceRegistration
         services.AddSingleton(modelPath);
 
         services.Configure<S3Settings>(configuration.GetSection("S3Settings"));
-        services.Configure<OpenAiSettings>(configuration.GetSection("OpenAI"));
+        services.Configure<SpeechModelSettings>(configuration.GetSection("OpenAI"));
         
         services.AddHttpClient<IAiChatService, OllamaChatService>(client =>
         {
@@ -36,12 +36,17 @@ public static class InfrastructureServiceRegistration
             client.Timeout = TimeSpan.FromSeconds(300);
         });
 
+        // Register HttpClient for Coqui TTS
+        services.AddHttpClient();
+
         services.AddScoped<IAiSpeechService>(provider =>
         {
             var fileStorage = provider.GetRequiredService<IFileStorageService>();
             var s3Settings = provider.GetRequiredService<IOptions<S3Settings>>();
             var model = provider.GetRequiredService<string>();
-            return new OpenAiSpeechService(fileStorage, s3Settings, model);
+            var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
+            var httpClient = httpClientFactory.CreateClient();
+            return new CoquiSpeechService(fileStorage, s3Settings, model, httpClient);
         });
         
         services.AddScoped<IAssignmentRepository, AssignmentRepository>();

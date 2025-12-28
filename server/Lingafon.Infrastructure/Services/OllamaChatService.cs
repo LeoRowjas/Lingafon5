@@ -17,14 +17,17 @@ public class OllamaChatService : IAiChatService
 
     public async Task<string> GetReplyAsync(string systemPrompt, List<(string role, string content)> messages)
     {
+        // Build prompt with system prompt and conversation history
+        var prompt = BuildPrompt(systemPrompt, messages);
+
         var requestBody = new
         {
             model = _model,
-            messages = BuildMessages(systemPrompt, messages),
+            prompt = prompt,
             stream = false
         };
 
-        var request = new HttpRequestMessage(HttpMethod.Post, "http://ollama:11434/api/chat");
+        var request = new HttpRequestMessage(HttpMethod.Post, "http://ollama:11434/api/generate");
         request.Content = JsonContent.Create(requestBody);
 
         var response = await _httpClient.SendAsync(request);
@@ -32,22 +35,26 @@ public class OllamaChatService : IAiChatService
 
         var json = await response.Content.ReadAsStringAsync();
         using var doc = JsonDocument.Parse(json);
-        return doc.RootElement.GetProperty("message").GetProperty("content").GetString() ?? string.Empty;
+        return doc.RootElement.GetProperty("response").GetString() ?? string.Empty;
     }
 
-    private static List<object> BuildMessages(string systemPrompt, List<(string role, string content)> messages)
+    private static string BuildPrompt(string systemPrompt, List<(string role, string content)> messages)
     {
-        var result = new List<object>
-        {
-            new { role = "system", content = systemPrompt }
-        };
+        var sb = new System.Text.StringBuilder();
+        
+        // Add system prompt
+        sb.AppendLine($"System: {systemPrompt}");
+        sb.AppendLine();
 
+        // Add conversation history
         foreach (var msg in messages)
         {
-            result.Add(new { role = msg.role, content = msg.content });
+            var roleLabel = msg.role == "user" ? "User" : "Assistant";
+            sb.AppendLine($"{roleLabel}: {msg.content}");
         }
 
-        return result;
+        sb.AppendLine("Assistant:");
+        return sb.ToString();
     }
 }
 
