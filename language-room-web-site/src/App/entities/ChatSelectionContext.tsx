@@ -3,8 +3,9 @@ import { createContext, useContext, useState } from "react";
 /* ====== TYPES ====== */
 
 export type Student = {
-  id: number;
+  id: string;
   name: string;
+  inviteToken?: string;
 };
 
 export type StudentChoice = {
