@@ -14,11 +14,28 @@
     padding: 20px 40px;
     border-radius: 16px;
 }
+.header {
+  margin-bottom: 32px;
+}
+
+.headerActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+}
+
 .title {
   font-size: 36px;
   font-weight: 700;
   color: #333;
-  margin: 0 0 16px;
+  margin: 0;
 }
 
 .groupsGrid {
@@ -27,6 +44,107 @@
   gap: 20px;
 }
 
+.groupCard {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  gap: 16px;
+  transition: all 0.2s;
+}
+
+.groupInfo {
+  flex: 1;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.groupName {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 8px;
+}
+
+.studentsCount {
+  font-size: 14px;
+  color: #999;
+  margin: 0;
+}
+
+.groupActions {
+  display: flex;
+  gap: 12px;
+}
+
+.editBtn,
+.deleteBtn {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.editBtn {
+  background: #f0f0f0;
+  color: #666;
+
+  &:hover {
+    background: #e0e0e0;
+  }
+}
+
+.deleteBtn {
+  background: #ffebee;
+  color: #f44336;
+
+  &:hover {
+    background: #ffcdd2;
+  }
+}
+
+.modalTitle {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 24px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.modalActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.cancelBtn {
+  padding: 14px 32px;
+  background: #f0f0f0;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #e0e0e0;
+  }
+}
 .bg{
   min-height: 100vh;
   display: flex;

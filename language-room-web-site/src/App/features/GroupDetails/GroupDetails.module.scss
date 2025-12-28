@@ -1,32 +1,148 @@
 // features/GroupDetails/GroupDetails.module.scss
 .container {
-  width: 1200px;
+  width: 1337px;
   margin: 0 auto;
-
   padding: 40px 20px;
-}
-
-.formBlock{
-  background-color: #F3F5F7;
-  border-radius: 12px;
-  padding: 15px 30px;
 }
 
 .header {
   margin-bottom: 32px;
 }
 
+.headerActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+}
+
 .title {
   font-size: 36px;
   font-weight: 700;
   color: #333;
-  margin: 0 0 16px;
+  margin: 0;
 }
 
 .studentsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(700px, 1fr));
   gap: 20px;
+}
+
+.studentCard {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  gap: 16px;
+}
+
+.studentInfo {
+  flex: 1;
+}
+
+.studentName {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 8px;
+}
+
+.score {
+  font-size: 14px;
+  color: #999;
+  margin: 0;
+}
+.formMain{
+  background-color: #F3F5F7;
+  border-radius: 12px;
+  padding: 15px 30px;
+}
+.studentActions {
+  display: flex;
+  gap: 12px;
+}
+
+.editBtn,
+.deleteBtn {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.editBtn {
+  background: #f0f0f0;
+  color: #666;
+
+  &:hover {
+    background: #e0e0e0;
+  }
+}
+
+.deleteBtn {
+  background: #ffebee;
+  color: #f44336;
+
+  &:hover {
+    background: #ffcdd2;
+  }
+}
+
+.modalTitle {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 24px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.modalActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.cancelBtn {
+  padding: 14px 32px;
+  background: #f0f0f0;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #e0e0e0;
+  }
 }
 .bg{
   min-height: 100vh;
