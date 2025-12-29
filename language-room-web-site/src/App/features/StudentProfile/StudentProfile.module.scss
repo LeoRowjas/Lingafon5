@@ -1,6 +1,6 @@
 // features/StudentProfile/StudentProfile.module.scss
 .container {
-  max-width: 1200px;
+  width: 1200px;
   margin: 0 auto;
   padding: 40px 20px;
 }
@@ -72,4 +72,27 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
+}
+
+.bgImage{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+.bg{
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.formMain{
+  background-color: #F3F5F7;
+  border-radius: 12px;
+  padding: 15px 30px;
 }
