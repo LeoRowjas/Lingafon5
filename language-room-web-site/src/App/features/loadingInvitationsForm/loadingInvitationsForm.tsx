@@ -1,11 +1,10 @@
-import styles from "./../SelectRoleForm/SelectRoleForm.module.scss";
-import bgImage from "@assets/bgLogin.png";
-import { useStudentChoice } from "@entities/ChatSelectionContext";
+import bgImage from "@assets/bgLogin.png"
 import clockImg from '@assets/clok.png'
-import { sendChatInvite } from "@shared/mock/chatEvents.mock";
-import { useNavigate, Link } from 'react-router-dom'
-import { getInvites } from "@entities/invite/api/inviteApi";
-import { useEffect } from "react";
+import { useStudentChoice } from "@entities/ChatSelectionContext"
+import { getInvites } from "@entities/invite/api/inviteApi"
+import { useEffect } from "react"
+import { Link, useNavigate } from 'react-router-dom'
+import styles from "./../SelectRoleForm/SelectRoleForm.module.scss"
 
 export function LoadingInvitationsForm () {
 

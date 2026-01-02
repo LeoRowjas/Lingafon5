@@ -80,12 +80,14 @@ export function GroupDetails() {
 
       <div className={styles.studentsGrid}>
         {studentsMock.map((student) => (
-          <Link to="/student-profile">
+          
           <div key={student.id} className={styles.studentCard}>
+            <Link to="/student-profile">
             <div className={styles.studentInfo}>
               <h3 className={styles.studentName}>{student.name}</h3>
               <p className={styles.score}>Средний балл: {student.averageScore}</p>
             </div>
+            </Link>
             <div className={styles.studentActions}>
               <button 
                 className={styles.editBtn}
@@ -100,8 +102,8 @@ export function GroupDetails() {
                 Удалить
               </button>
             </div>
+
           </div>
-          </Link>
         ))}
       </div>
 

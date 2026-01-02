@@ -1,10 +1,10 @@
-import { useEffect, useState, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import bgImage from "@assets/bgLogin.png";
-import styles from "./IncomingInvitationsForm.module.scss";
+import bgImage from "@assets/bgLogin.png"
+import { useEffect, useRef, useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import styles from "./IncomingInvitationsForm.module.scss"
 
-import type { Invite } from "../../entities/invite/model/types";
-import { getInvites, acceptInvite, deleteInvite } from "../../entities/invite/api/inviteApi";
+import { acceptInvite, deleteInvite, getInvites } from "../../entities/invite/api/inviteApi"
+import type { Invite } from "../../entities/invite/model/types"
 
 export function IncomingInvitationsForm() {
   const [invites, setInvites] = useState<Invite[]>([]);

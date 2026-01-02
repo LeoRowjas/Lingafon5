@@ -1,7 +1,7 @@
-import { useState } from "react";
-import styles from "./TeacherCard.module.scss";
 import avatar from '@assets/Avatar.png'
-import { Link } from "react-router-dom";
+import { useState } from "react"
+import { Link } from "react-router-dom"
+import styles from "./TeacherCard.module.scss"
 
 export const TeacherCard = () => {
 

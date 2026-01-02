@@ -3,8 +3,14 @@
   top: 0;
   left: 0;
   right: 0;
+
+  height: 120px; 
   z-index: 1000;
+
+  display: flex;
+  align-items: center;
 }
+
 
 .logoLink {
   margin-left: 30px;
