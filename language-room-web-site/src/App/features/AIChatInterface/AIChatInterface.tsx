@@ -20,6 +20,8 @@ export function AIChatInterface() {
   const [dialogId] = useState(crypto.randomUUID())
   const [inputText, setInputText] = useState('')
   const [isRecording, setIsRecording] = useState(false)
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null)
+  const [playingMessageId, setPlayingMessageId] = useState<number | null>(null)
 
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -30,6 +32,33 @@ export function AIChatInterface() {
       time: new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })
     }
   ])
+
+  const togglePlay = (msg: Message) => {
+    // если нажали на то же сообщение
+    if (playingMessageId === msg.id && currentAudio) {
+      currentAudio.pause()
+      currentAudio.currentTime = 0
+      setPlayingMessageId(null)
+      return
+    }
+
+    // если что-то другое уже играет
+    if (currentAudio) {
+      currentAudio.pause()
+      currentAudio.currentTime = 0
+    }
+
+    // запускаем новое
+    const audio = new Audio(msg.content)
+    audio.play()
+
+    audio.onended = () => {
+      setPlayingMessageId(null)
+    }
+
+    setCurrentAudio(audio)
+    setPlayingMessageId(msg.id)
+  }
 
   const toggleTranscription = (id: number) => {
     setMessages(prev =>
@@ -86,6 +115,7 @@ export function AIChatInterface() {
     mediaRecorder.onstop = async () => {
       const blob = new Blob(audioChunks, { type: "audio/webm" })
       const file = new File([blob], "voice.webm", { type: "audio/webm" })
+      const audioUrl = URL.createObjectURL(file)
 
       const userMessageId = Date.now()
 
@@ -96,7 +126,7 @@ export function AIChatInterface() {
           id: userMessageId,
           type: "voice",
           sender: "user",
-          content: "",
+          content: audioUrl,
           time: new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }),
           showTranscription: false
         }
@@ -179,9 +209,9 @@ export function AIChatInterface() {
                 <div className={styles.voiceMessage}>
                   <button
                       className={styles.playButton}
-                      onClick={() => new Audio(msg.content).play()}
+                      onClick={() =>  togglePlay(msg)}
                     >
-                      ▶
+                      {playingMessageId === msg.id ? "⏸" : "▶"}
                   </button>
                   <div className={styles.voiceProgress}>
                     <div className={styles.progressBar} style={{ width: '0%' }}></div>
