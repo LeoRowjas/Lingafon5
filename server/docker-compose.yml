@@ -18,10 +18,13 @@ services:
       - S3__SecretKey=minioadmin
       - S3__BucketName=avatars
       - S3__BucketNameAudio=audiomessages
+      - KOKORO_BASE_URL=http://kokoro:8880
     depends_on:
       postgres:
         condition: service_healthy
       minio-init:
+        condition: service_completed_successfully
+      ollama-pull:
         condition: service_completed_successfully
     networks:
       - lingafon-network
@@ -40,11 +43,47 @@ services:
       - lingafon-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434/"]
+      test: [ "CMD", "curl", "-f", "http://localhost:11434/api/tags" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+        
+  ollama-pull:
+    image: ollama/ollama:latest
+    container_name: lingafon-ollama-pull
+    depends_on:
+      ollama:
+        condition: service_started
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    volumes:
+      - ollama_data:/root/.ollama
+    entrypoint: >
+      sh -c "
+      echo 'Pulling model phi:latest';
+      ollama pull phi:latest;
+      echo 'Model ready';
+      "
+    networks:
+      - lingafon-network
+    restart: "no"
+  
+  kokoro:
+    image: ghcr.io/remsky/kokoro-fastapi-cpu:latest
+    container_name: lingafon-kokoro
+    ports:
+      - "8880:8880"
+    volumes:
+      - kokoro-data:/data
+    networks:
+      - lingafon-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8880/" ]
       interval: 10s
       timeout: 5s
       retries: 5
-
+      
   minio:
     image: minio/minio:latest
     container_name: lingafon-minio
@@ -114,3 +153,4 @@ volumes:
   postgres_data:
   minio-data:
   ollama_data:
+  kokoro-data:

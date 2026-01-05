@@ -126,8 +126,9 @@ public class UserService : IUserService
 
         var user = await _repository.GetByIdAsync(id);
         if (user is null)
-            return false;
-        await _storageService.DeleteFileAsync(user.AvatarUrl, _storageSettings.BucketNameAvatars);
+            return false; 
+        var fileName = user.AvatarUrl.Split('/').Last();
+        await _storageService.DeleteFileAsync(fileName, _storageSettings.BucketNameAvatars);
         return await _repository.DeleteAvatarAsync(id);
     }
 }

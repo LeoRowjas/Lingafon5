@@ -1,17 +1,20 @@
 using System.Net.Http.Json;
 using System.Text.Json;
+using Lingafon.Core.Interfaces.Repositories;
 using Lingafon.Core.Interfaces.Services;
 
 namespace Lingafon.Infrastructure.Services;
 
 public class OllamaChatService : IAiChatService
 {
+    private readonly IMessageRepository _messageRepository;
     private readonly HttpClient _httpClient;
     private readonly string _model;
 
-    public OllamaChatService(HttpClient httpClient)
+    public OllamaChatService(HttpClient httpClient, IMessageRepository messageRepository)
     {
         _httpClient = httpClient;
+        _messageRepository = messageRepository;
         _model = "phi:latest";
     }
 
@@ -23,7 +26,7 @@ public class OllamaChatService : IAiChatService
         var requestBody = new
         {
             model = _model,
-            prompt = prompt,
+            prompt,
             stream = false
         };
 

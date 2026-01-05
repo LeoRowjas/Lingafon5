@@ -1,4 +1,6 @@
 using System.Text;
+using Microsoft.ML.OnnxRuntime;
+using KokoroSharp;
 using Lingafon.Api.Middleware;
 using Lingafon.API.WebSockets;
 using Lingafon.Application;
@@ -8,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using SessionOptions = Microsoft.ML.OnnxRuntime.SessionOptions;
 
 namespace Lingafon.API;
 

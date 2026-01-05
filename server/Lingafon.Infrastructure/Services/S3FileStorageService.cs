@@ -52,7 +52,7 @@ public class S3FileStorageService : IFileStorageService
 
         await _client.PutObjectAsync(putRequest);
         // return URL using the actual bucket name used for upload
-        return $"{_settings.ServiceUrl}/{bucketName}/{fileName}";
+        return $"http://localhost:9000/{bucketName}/{fileName}";
     }
 
     public async Task DeleteFileAsync(string fileName, string bucketName)

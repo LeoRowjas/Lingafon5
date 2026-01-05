@@ -28,11 +28,15 @@ public static class InfrastructureServiceRegistration
         services.AddSingleton(modelPath);
 
         services.Configure<S3Settings>(configuration.GetSection("S3Settings"));
-        services.Configure<SpeechModelSettings>(configuration.GetSection("OpenAI"));
         
         services.AddHttpClient<IAiChatService, OllamaChatService>(client =>
         {
             client.BaseAddress = new Uri("http://ollama:11434/");
+            client.Timeout = TimeSpan.FromSeconds(300);
+        });
+        services.AddHttpClient<IAiSpeechService, AiTextSpeechService>(client =>
+        {
+            client.BaseAddress = new Uri("http://kokoro:8880");
             client.Timeout = TimeSpan.FromSeconds(300);
         });
 
@@ -46,7 +50,7 @@ public static class InfrastructureServiceRegistration
             var model = provider.GetRequiredService<string>();
             var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
             var httpClient = httpClientFactory.CreateClient();
-            return new CoquiSpeechService(fileStorage, s3Settings, model, httpClient);
+            return new AiTextSpeechService(fileStorage, s3Settings, model, httpClient);
         });
         
         services.AddScoped<IAssignmentRepository, AssignmentRepository>();

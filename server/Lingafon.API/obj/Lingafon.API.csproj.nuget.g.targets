@@ -8,5 +8,6 @@
     <Import Project="$(NuGetPackageRoot)mono.texttemplating/3.0.0/buildTransitive/Mono.TextTemplating.targets" Condition="Exists('$(NuGetPackageRoot)mono.texttemplating/3.0.0/buildTransitive/Mono.TextTemplating.targets')" />
     <Import Project="$(NuGetPackageRoot)microsoft.extensions.configuration.binder/10.0.1/buildTransitive/netstandard2.0/Microsoft.Extensions.Configuration.Binder.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.extensions.configuration.binder/10.0.1/buildTransitive/netstandard2.0/Microsoft.Extensions.Configuration.Binder.targets')" />
     <Import Project="$(NuGetPackageRoot)microsoft.codeanalysis.analyzers/3.3.4/buildTransitive/Microsoft.CodeAnalysis.Analyzers.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.codeanalysis.analyzers/3.3.4/buildTransitive/Microsoft.CodeAnalysis.Analyzers.targets')" />
+    <Import Project="$(NuGetPackageRoot)kokorosharp/0.6.2/buildTransitive/KokoroSharp.targets" Condition="Exists('$(NuGetPackageRoot)kokorosharp/0.6.2/buildTransitive/KokoroSharp.targets')" />
   </ImportGroup>
 </Project>

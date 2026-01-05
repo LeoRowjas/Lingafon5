@@ -248,7 +248,6 @@ public class MessageService : IMessageService
 4. Encourage the student to learn
 5. Continue the conversation naturally while maintaining the teaching role
 6. Be patient and supportive
-
-When correcting mistakes, explain why the correction is needed and provide the correct form.";
+Give an answer around 60 words.";
     }
 }
