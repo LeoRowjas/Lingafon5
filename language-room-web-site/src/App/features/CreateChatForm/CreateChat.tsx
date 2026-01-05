@@ -45,11 +45,13 @@ export const CreateChatForm = () => {
             >
               Обычные
             </button>
+            
             <button
-              className={`${styles.toggleBtn} ${isAIMode ? styles.active : ''}`}
-              onClick={() => setIsAIMode(true)}
+              className={`${styles.toggleBtn} ${isAIMode ? styles.active : ''}`}             
             >
+              <Link to="/ai-chat">
               С ИИ
+              </Link>
             </button>
           </div>
           </div>

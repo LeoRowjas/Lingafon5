@@ -1,6 +1,8 @@
 import bgImage from "@assets/bgLogin.png"
 import { useState } from 'react'
 import styles from './AIChatInterface.module.scss'
+import { sendVoice, getAiReply } from '../../../api/aiChat'
+
 interface Message {
   id: number
   type: 'text' | 'voice'
@@ -13,91 +15,128 @@ interface Message {
 }
 
 export function AIChatInterface() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 1,
-      type: 'text',
-      sender: 'ai',
-      content: 'Привет! Я ваш ИИ-помощник. Чем могу помочь?',
-      time: '14:30'
-    },
-    {
-      id: 2,
-      type: 'voice',
-      sender: 'user',
-      content: '',
-      time: '14:31',
-      voiceDuration: '0:04',
-      transcription: 'Привет! Расскажи мне о погоде',
-      showTranscription: false
-    },
-    {
-      id: 3,
-      type: 'voice',
-      sender: 'ai',
-      content: '',
-      time: '14:32',
-      voiceDuration: '0:16',
-      transcription: 'К сожалению, у меня нет доступа к актуальным данным о погоде. Но я могу рассказать вам о том, как формируется погода или помочь с другими вопросами!',
-      showTranscription: false
-    }
-  ])
-
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
+  const [audioChunks, setAudioChunks] = useState<Blob[]>([])
+  const [dialogId] = useState(crypto.randomUUID())
   const [inputText, setInputText] = useState('')
   const [isRecording, setIsRecording] = useState(false)
 
-  const toggleTranscription = (messageId: number) => {
-    setMessages(messages.map(msg => 
-      msg.id === messageId 
-        ? { ...msg, showTranscription: !msg.showTranscription }
-        : msg
-    ))
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: 1,
+      type: "text",
+      sender: "ai",
+      content: "Привет! Я ваш ИИ-помощник. Нажмите 🎤 и начните говорить.",
+      time: new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })
+    }
+  ])
+
+  const toggleTranscription = (id: number) => {
+    setMessages(prev =>
+      prev.map(m =>
+        m.id === id ? { ...m, showTranscription: !m.showTranscription } : m
+      )
+    )
   }
 
   const sendTextMessage = () => {
-    if (inputText.trim()) {
-      const newMessage: Message = {
+    if (!inputText.trim()) return
+
+    setMessages(prev => [
+      ...prev,
+      {
         id: Date.now(),
-        type: 'text',
-        sender: 'user',
+        type: "text",
+        sender: "user",
         content: inputText,
-        time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
+        time: new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })
       }
-      setMessages([...messages, newMessage])
-      setInputText('')
-    }
+    ])
+
+    setInputText("")
   }
 
-  const startRecording = () => {
-    setIsRecording(true)
-    console.log('Начало записи голосового...')
-    // Здесь будет логика записи голосового через MediaRecorder API
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const recorder = new MediaRecorder(stream)
+
+      setAudioChunks([])
+
+      recorder.ondataavailable = e => {
+        if (e.data.size > 0) {
+          setAudioChunks(prev => [...prev, e.data])
+        }
+      }
+
+      recorder.start()
+      setMediaRecorder(recorder)
+      setIsRecording(true)
+    } catch (e) {
+      console.error("Микрофон недоступен", e)
+    }
   }
 
   const stopRecording = () => {
-    setIsRecording(false)
-    console.log('Отправка голосового...')
+    if (!mediaRecorder) return
 
-    // Симуляция отправки голосового
-    const newVoiceMessage: Message = {
-      id: Date.now(),
-      type: 'voice',
-      sender: 'user',
-      content: '',
-      time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
-      voiceDuration: '0:05',
-      transcription: 'Текст вашего голосового сообщения',
-      showTranscription: false
+    mediaRecorder.stop()
+    setIsRecording(false)
+
+    mediaRecorder.onstop = async () => {
+      const blob = new Blob(audioChunks, { type: "audio/webm" })
+      const file = new File([blob], "voice.webm", { type: "audio/webm" })
+
+      const userMessageId = Date.now()
+
+      /** добавляем сообщение пользователя */
+      setMessages(prev => [
+        ...prev,
+        {
+          id: userMessageId,
+          type: "voice",
+          sender: "user",
+          content: "",
+          time: new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }),
+          showTranscription: false
+        }
+      ])
+
+      /** отправляем голос */
+      try {
+        const voiceResult = await sendVoice(dialogId, file)
+
+        setMessages(prev =>
+          prev.map(m =>
+            m.id === userMessageId
+              ? { ...m, transcription: voiceResult.transcription }
+              : m
+          )
+        )
+
+        /** запрашиваем ответ ИИ */
+        const aiResult = await getAiReply(dialogId)
+
+        setMessages(prev => [
+          ...prev,
+          {
+            id: Date.now(),
+            type: "voice",
+            sender: "ai",
+            content: aiResult.audioUrl ?? "",
+            transcription: aiResult.reply,
+            showTranscription: false,
+            time: new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })
+          }
+        ])
+      } catch (e) {
+        console.error("Ошибка диалога", e)
+      }
     }
-    setMessages([...messages, newVoiceMessage])
   }
 
   const handleMicClick = () => {
-    if (isRecording) {
-      stopRecording()
-    } else {
-      startRecording()
-    }
+    isRecording ? stopRecording() : startRecording()
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -138,7 +177,12 @@ export function AIChatInterface() {
                 <p className={styles.messageText}>{msg.content}</p>
               ) : (
                 <div className={styles.voiceMessage}>
-                  <button className={styles.playButton}>▶</button>
+                  <button
+                      className={styles.playButton}
+                      onClick={() => new Audio(msg.content).play()}
+                    >
+                      ▶
+                  </button>
                   <div className={styles.voiceProgress}>
                     <div className={styles.progressBar} style={{ width: '0%' }}></div>
                   </div>
