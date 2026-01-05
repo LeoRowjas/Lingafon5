@@ -17,15 +17,16 @@ import { IncomingInvitations } from '@pages/incomingInvitations/IncomingInvitati
 import { Login } from '@pages/Login/Login'
 
 import { Profile } from '@pages/Profile/Profile'
+import { ProfileTeacher } from '@pages/ProfileTeacher/ProfileTeacher'
 import { Registration } from '@pages/Registration/Registration'
 import { SelectRole } from '@pages/SelectRole/SelectRole'
 import { StudentChoice } from '@pages/StudentChoice/StudentChoice'
+import { Student_profile } from '@pages/StudentProfile/StudentProfile'
 import { TaskStatistics } from '@pages/TaskStatistics/TaskStatistics'
 import { LoadingInvitations } from '@pages/loadingInvitations/loadingInvitations'
-import { ProfileTeacher } from '@pages/ProfileTeacher/ProfileTeacher'
-import { Student_profile } from '@pages/StudentProfile/StudentProfile'
 
 import { Header } from '@ui/Header/Header'
+import { AIChat } from '@pages/AIChat/AIChat'
 
 import { Route, Routes } from "react-router-dom"
 export function App() {
@@ -49,6 +50,7 @@ export function App() {
       <Route path="/chat/:id" element={<Chat/>} />
       <Route path="/dialog" element={<Dialog/>} />
       <Route path="/live-dialog" element={<LiveDialogPage />} />
+      <Route path="/ai-chat" element={<AIChat/>} />
       <Route path="/groups-list" element={<GroupsListPage />} />
       <Route path="/group-details" element={<GroupDetailsPage />} />
       <Route path="/dialog-report" element={<DialogReportPage />} />

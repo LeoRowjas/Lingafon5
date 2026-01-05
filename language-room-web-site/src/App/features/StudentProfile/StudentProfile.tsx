@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom'
 import { DialogCard } from '@ui/DialogCard/DialogCard'
 import { BackButton } from '@ui/BackButton/BackButton'
 import styles from './StudentProfile.module.scss'
+import bgImage from "@assets/bgLogin.png"
 
 interface Dialog {
   id: string
@@ -21,7 +22,10 @@ export function StudentProfile() {
   const { groupId } = useParams<{ groupId: string }>()
 
   return (
+    <div className={styles.bg}>
+      <img className={styles.bgImage} src={bgImage} alt="background" />
     <div className={styles.container}>
+      <div className={styles.formMain}>
       <div className={styles.header}>
         <h1 className={styles.title}>Профиль ученика</h1>
         <BackButton label="Назад к группе" to={`/group-details`} />
@@ -61,6 +65,8 @@ export function StudentProfile() {
           ))}
         </div>
       </div>
+      </div>
+    </div>
     </div>
   )
 }

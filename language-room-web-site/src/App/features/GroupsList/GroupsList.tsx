@@ -74,7 +74,7 @@ export function GroupsList() {
       <div className={styles.header}>
         <h1 className={styles.title}>Учебные группы</h1>
         <div className={styles.headerActions}>
-          <BackButton label="Назад" to="/" />
+          <BackButton label="Назад" to="/profile-teacher" />
           <ActionButton variant="blue" onClick={() => setIsAddModalOpen(true)}>
             + Добавить группу
           </ActionButton>

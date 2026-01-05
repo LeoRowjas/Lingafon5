@@ -1,6 +1,7 @@
 import bgImage from "@assets/bgLogin.png"
 import { InfoItem } from '@ui/InfoItem/InfoItem'
 import { ProgressBar } from '@ui/ProgressBar/ProgressBar'
+import { Link } from 'react-router-dom'
 import styles from './ChatForm.module.scss'
 
 import { dialogsMock, formatDuration, getStatusText, issuesMock, messagesMock, recommendationsMock } from './ChatForm.logic.ts'
@@ -31,6 +32,7 @@ export function ChatForm() {
                 </div>
                 ))}
                 
+                <Link className={styles.back} to='/task'>← Вернуться в статистику заданий</Link>
 
                 <div className={styles.block}>
                     <h2>Информация о диалоге</h2>

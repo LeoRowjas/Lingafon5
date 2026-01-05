@@ -21,6 +21,7 @@ export function DevNavigation() {
         { path: '/dialog-report', name: 'Dialog Report' },
         { path: '/active-sessions', name: 'Active Sessions' },
         { path: '/incoming-invitations', name: 'IncomingInvitations' },
+        { path: '/ai-chat', name: 'AI Chat' },
     ]
 
     return (

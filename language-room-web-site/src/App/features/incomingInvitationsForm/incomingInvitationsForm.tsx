@@ -90,7 +90,7 @@ export function IncomingInvitationsForm() {
 
       <section className={styles.container}>
         <h1 className={styles.title}>Входящие приглашения</h1>
-        <Link className={styles.back} to="/">
+        <Link className={styles.back} to="/profile">
           ← Вернуться в личный кабинет
         </Link>
 
