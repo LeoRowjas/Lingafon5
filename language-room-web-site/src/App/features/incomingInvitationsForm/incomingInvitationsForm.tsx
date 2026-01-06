@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import bgImage from "@assets/bgLogin.png";
 import styles from "./IncomingInvitationsForm.module.scss";
 
 import type { Invite } from "../../entities/invite/model/types";
@@ -86,7 +85,6 @@ export function IncomingInvitationsForm() {
 
   return (
     <div className={styles.bg}>
-      <img className={styles.bgImage} src={bgImage} alt="background" />
 
       <section className={styles.container}>
         <h1 className={styles.title}>Входящие приглашения</h1>

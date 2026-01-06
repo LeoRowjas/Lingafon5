@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import './App.scss'
-
+import bgImage from "@assets/bgLogin.png";
 import { Chat } from '@pages/Chat/Chat'
 import { ConfirmedInvitations } from '@pages/ConfirmedInvitations/ConfirmedInvitations'
 import { CreateChat } from '@pages/CreateChat/CreateChat'
@@ -35,6 +35,7 @@ export function App() {
 
   return (
     <>
+    <img className="bgImage" src={bgImage} alt="background" />
     <Header />
     <Routes>
       <Route path="/" element={<DevNavigation />} />

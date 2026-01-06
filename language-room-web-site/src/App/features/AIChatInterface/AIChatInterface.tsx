@@ -178,7 +178,7 @@ export function AIChatInterface() {
 
   return (
     <div className={styles.bg}>
-      <img className={styles.bgImage} src={bgImage} alt="background" />
+
     <div className={styles.chatContainer}>
       {/* Header */}
       <div className={styles.chatHeader}>

@@ -1,5 +1,5 @@
 import styles from "./DialogForm.module.scss";
-import bgImage from "@assets/bgLogin.png";
+
 import { useState } from "react";
 import {learningMaterials} from './DialogForm.logic'
 
@@ -8,8 +8,6 @@ export function DialogForm () {
     const [selectedMaterial, setSelectedMaterial] = useState<string | null>(null);
     return(
         <div className={styles.bg}>
-            <img className={styles.bgImage} src={bgImage} alt="background" />
-
             <div>
 
                 <section className={styles.selectRole}>
