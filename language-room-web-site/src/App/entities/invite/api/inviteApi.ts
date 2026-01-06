@@ -1,12 +1,6 @@
-import type { Invite } from "../model/types";
-import axios from "axios";
 import { authFetch } from "../../../../shared/api/authFetch";
 
 const API_URL = import.meta.env.VITE_API_URL;
-
-const api = axios.create({
-  baseURL: "/api",
-});
 
 function getToken() {
   return localStorage.getItem("token");
@@ -59,5 +53,16 @@ export async function sendInvite(
 }
 
 export async function deleteInvite(id: string): Promise<void> {
-  await api.delete(`/Invite/${id}`);
+  const res = await fetch(`${API_URL}/Invite/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Ошибка отклонения приглашения");
+  }
+  return res.json();
 }
